@@ -3,12 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Upload, Search, ScanLine, BarChart3, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import DocumentUpload from "./DocumentUpload";
+import { useNavigation } from "@/contexts/NavigationContext";
 
 const QuickActions = () => {
   const [scanModalOpen, setScanModalOpen] = useState(false);
   const [reportsModalOpen, setReportsModalOpen] = useState(false);
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const { setActiveTab } = useNavigation();
 
   const handleScan = () => {
     setScanModalOpen(true);
@@ -19,7 +19,7 @@ const QuickActions = () => {
   };
 
   const handleUpload = () => {
-    setUploadModalOpen(true);
+    setActiveTab('EnhancedUpload');
   };
 
   const handleAISearch = () => {
@@ -89,13 +89,6 @@ const QuickActions = () => {
           </div>
         </div>
       </Card>
-
-      {/* Upload Modal */}
-      <Dialog open={uploadModalOpen} onOpenChange={setUploadModalOpen}>
-        <DialogContent>
-          <DocumentUpload onUploadComplete={() => setUploadModalOpen(false)} />
-        </DialogContent>
-      </Dialog>
 
       {/* Scan Modal */}
       <Dialog open={scanModalOpen} onOpenChange={setScanModalOpen}>

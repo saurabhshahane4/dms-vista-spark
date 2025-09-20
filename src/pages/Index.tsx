@@ -8,6 +8,7 @@ import Documents from "@/pages/Documents";
 import PhysicalTracking from "@/pages/PhysicalTracking";
 import Workflow from "@/pages/Workflow";
 import Analytics from "@/pages/Analytics";
+import EnhancedUpload from "@/pages/EnhancedUpload";
 import { FileText, Archive, Clock, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDocuments } from "@/hooks/useDocuments";
@@ -17,6 +18,11 @@ const Index = () => {
   const { user, loading } = useAuth();
   const { stats } = useDocuments();
   const { activeTab } = useNavigation();
+  
+  // Check if we should show the enhanced upload page
+  if (activeTab === 'EnhancedUpload') {
+    return <EnhancedUpload />;
+  }
 
   // Show loading state while contexts are initializing
   if (loading) {
