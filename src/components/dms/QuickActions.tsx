@@ -25,37 +25,6 @@ const QuickActions = () => {
     }
   };
 
-  const actions = [
-    {
-      name: "Upload",
-      icon: Upload,
-      bgColor: "bg-dms-green",
-      description: "Upload new documents",
-      component: <DocumentUpload key="upload" />
-    },
-    {
-      name: "AI Search",
-      icon: Search,
-      bgColor: "bg-dms-blue", 
-      description: "Intelligent document search",
-      onClick: handleAISearch
-    },
-    {
-      name: "Scan",
-      icon: ScanLine,
-      bgColor: "bg-dms-orange",
-      description: "Scan physical documents",
-      onClick: handleScan
-    },
-    {
-      name: "Reports",
-      icon: BarChart3,
-      bgColor: "bg-dms-purple",
-      description: "Generate reports",
-      onClick: handleReports
-    },
-  ];
-
   return (
     <>
       <Card className="p-6 bg-card shadow-soft border border-border/50">
@@ -70,28 +39,55 @@ const QuickActions = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          {actions.map((action, index) => (
-            action.component ? (
-              <div key={index} className="flex">
-                {action.component}
-              </div>
-            ) : (
-              <Button
-                key={index}
-                variant="ghost"
-                className="h-auto p-4 flex flex-col items-center gap-3 hover:bg-muted/50 border border-border/30 hover:border-border/60 transition-colors"
-                onClick={action.onClick}
-              >
-                <div className={`w-12 h-12 rounded-full ${action.bgColor} flex items-center justify-center`}>
-                  <action.icon className="w-6 h-6 text-white" />
-                </div>
-                <div className="text-center">
-                  <div className="font-medium text-foreground">{action.name}</div>
-                  <div className="text-xs text-muted-foreground">{action.description}</div>
-                </div>
-              </Button>
-            )
-          ))}
+          {/* Upload Document */}
+          <div className="flex flex-col items-center">
+            <DocumentUpload />
+          </div>
+
+          {/* AI Search */}
+          <Button
+            variant="ghost"
+            className="h-auto p-4 flex flex-col items-center gap-3 hover:bg-muted/50 border border-border/30 hover:border-border/60 transition-colors"
+            onClick={handleAISearch}
+          >
+            <div className="w-12 h-12 rounded-full bg-dms-blue flex items-center justify-center">
+              <Search className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-center">
+              <div className="font-medium text-foreground">AI Search</div>
+              <div className="text-xs text-muted-foreground">Intelligent document search</div>
+            </div>
+          </Button>
+
+          {/* Scan */}
+          <Button
+            variant="ghost"
+            className="h-auto p-4 flex flex-col items-center gap-3 hover:bg-muted/50 border border-border/30 hover:border-border/60 transition-colors"
+            onClick={handleScan}
+          >
+            <div className="w-12 h-12 rounded-full bg-dms-orange flex items-center justify-center">
+              <ScanLine className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-center">
+              <div className="font-medium text-foreground">Scan</div>
+              <div className="text-xs text-muted-foreground">Scan physical documents</div>
+            </div>
+          </Button>
+
+          {/* Reports */}
+          <Button
+            variant="ghost"
+            className="h-auto p-4 flex flex-col items-center gap-3 hover:bg-muted/50 border border-border/30 hover:border-border/60 transition-colors"
+            onClick={handleReports}
+          >
+            <div className="w-12 h-12 rounded-full bg-dms-purple flex items-center justify-center">
+              <BarChart3 className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-center">
+              <div className="font-medium text-foreground">Reports</div>
+              <div className="text-xs text-muted-foreground">Generate reports</div>
+            </div>
+          </Button>
         </div>
       </Card>
 
