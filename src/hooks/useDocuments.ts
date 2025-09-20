@@ -4,12 +4,19 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface Document {
   id: string;
+  user_id: string;
   name: string;
-  status: string;
-  is_physical: boolean;
+  file_path: string | null;
+  file_size: number | null;
+  mime_type: string | null;
+  status: string | null;
+  is_physical: boolean | null;
+  tags: string[] | null;
+  category: string | null;
+  department: string | null;
+  folder_path: string | null;
   created_at: string;
-  file_size?: number;
-  tags?: string[];
+  updated_at: string;
 }
 
 interface DocumentStats {
@@ -19,8 +26,20 @@ interface DocumentStats {
   activeUsers: number;
 }
 
+interface FolderData {
+  name: string;
+  documentCount: number;
+  documents: Document[];
+  category: string;
+  icon: string;
+  iconBg: string;
+  modified: string;
+  tags: string[];
+}
+
 export const useDocuments = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [folders, setFolders] = useState<FolderData[]>([]);
   const [stats, setStats] = useState<DocumentStats>({
     totalDocuments: 0,
     physicalFiles: 0,
@@ -30,10 +49,51 @@ export const useDocuments = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
+  const getFolderIcon = (folderName: string): string => {
+    const iconMap: { [key: string]: string } = {
+      'Financial Records': 'DollarSign',
+      'Legal Documents': 'Scale',
+      'HR Documents': 'Users',
+      'Projects': 'FolderOpen',
+      'Marketing': 'Megaphone',
+      'Reports': 'BarChart3',
+      'Images': 'Image',
+      'PDF Documents': 'FileText',
+      'Spreadsheets': 'Sheet',
+      'Documents': 'FileText',
+      'Audio Files': 'Headphones',
+      'Video Files': 'Video',
+      'Archived': 'Archive',
+      'General': 'Folder'
+    };
+    return iconMap[folderName] || 'Folder';
+  };
+
+  const getFolderColor = (folderName: string): string => {
+    const colorMap: { [key: string]: string } = {
+      'Financial Records': 'bg-green-500',
+      'Legal Documents': 'bg-blue-500',
+      'HR Documents': 'bg-purple-500',
+      'Projects': 'bg-orange-500',
+      'Marketing': 'bg-pink-500',
+      'Reports': 'bg-indigo-500',
+      'Images': 'bg-yellow-500',
+      'PDF Documents': 'bg-red-500',
+      'Spreadsheets': 'bg-emerald-500',
+      'Documents': 'bg-gray-500',
+      'Audio Files': 'bg-violet-500',
+      'Video Files': 'bg-cyan-500',
+      'Archived': 'bg-slate-500',
+      'General': 'bg-blue-400'
+    };
+    return colorMap[folderName] || 'bg-gray-400';
+  };
+
   const fetchDocuments = async () => {
     if (!user) {
       setLoading(false);
       setDocuments([]);
+      setFolders([]);
       setStats({
         totalDocuments: 0,
         physicalFiles: 0,
@@ -52,12 +112,50 @@ export const useDocuments = () => {
 
       if (documentsError) throw documentsError;
 
-      setDocuments(documentsData || []);
+      const docs = documentsData || [];
+      setDocuments(docs);
+
+      // Organize documents into folders
+      const folderMap = new Map<string, Document[]>();
+      docs.forEach(doc => {
+        const folderName = doc.folder_path || 'General';
+        if (!folderMap.has(folderName)) {
+          folderMap.set(folderName, []);
+        }
+        folderMap.get(folderName)!.push(doc);
+      });
+
+      // Convert to folder structure
+      const foldersArray: FolderData[] = Array.from(folderMap.entries()).map(([folderName, folderDocs]) => {
+        // Get all unique tags from documents in this folder
+        const allTags = new Set<string>();
+        folderDocs.forEach(doc => {
+          doc.tags?.forEach(tag => allTags.add(tag));
+        });
+
+        // Get the most recent modification date
+        const mostRecentDate = folderDocs.reduce((latest, doc) => {
+          return new Date(doc.updated_at) > new Date(latest) ? doc.updated_at : latest;
+        }, folderDocs[0]?.updated_at || new Date().toISOString());
+
+        return {
+          name: folderName,
+          documentCount: folderDocs.length,
+          documents: folderDocs,
+          category: folderDocs[0]?.category || 'General',
+          icon: getFolderIcon(folderName),
+          iconBg: getFolderColor(folderName),
+          modified: new Date(mostRecentDate).toLocaleDateString(),
+          tags: Array.from(allTags).slice(0, 3) // Show max 3 tags
+        };
+      });
+
+      setFolders(foldersArray);
 
       // Calculate stats
-      const totalDocuments = documentsData?.length || 0;
-      const physicalFiles = documentsData?.filter(doc => doc.is_physical).length || 0;
-      const pendingApprovals = documentsData?.filter(doc => doc.status === 'pending').length || 0;
+      const totalDocuments = docs.length;
+      const physicalFiles = docs.filter(doc => doc.is_physical).length;
+      const pendingApprovals = docs.filter(doc => doc.status === 'pending').length;
 
       // Get active users count (simplified - just count profiles)
       const { count: activeUsersCount } = await supabase
@@ -129,6 +227,7 @@ export const useDocuments = () => {
 
   return {
     documents,
+    folders,
     stats,
     loading,
     refetch: fetchDocuments,

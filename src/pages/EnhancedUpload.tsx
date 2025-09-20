@@ -139,9 +139,11 @@ const EnhancedUpload = () => {
     setCurrentStep(2);
     
     try {
-      // Upload file to Supabase Storage
+      // Upload file to Supabase Storage with organized folder structure
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      const folderName = category || 'General';
+      const departmentFolder = department || 'HR';
+      const fileName = `${user.id}/${departmentFolder}/${folderName}/${Date.now()}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
         .from('documents')
@@ -172,7 +174,7 @@ const EnhancedUpload = () => {
         console.warn('AI processing failed, proceeding without AI analysis:', aiError);
       }
 
-      // Create document record with AI analysis
+      // Create document record with AI analysis and folder organization
       const tagsArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
       
       const { error: dbError } = await supabase
@@ -184,7 +186,9 @@ const EnhancedUpload = () => {
           file_size: file.size,
           mime_type: file.type,
           tags: tagsArray,
-          status: 'active'
+          status: 'active',
+          category: category || 'General',
+          department: department || 'HR'
         });
 
       if (dbError) throw dbError;

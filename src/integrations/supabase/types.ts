@@ -16,9 +16,12 @@ export type Database = {
     Tables: {
       documents: {
         Row: {
+          category: string | null
           created_at: string
+          department: string | null
           file_path: string | null
           file_size: number | null
+          folder_path: string | null
           id: string
           is_physical: boolean | null
           mime_type: string | null
@@ -29,9 +32,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          category?: string | null
           created_at?: string
+          department?: string | null
           file_path?: string | null
           file_size?: number | null
+          folder_path?: string | null
           id?: string
           is_physical?: boolean | null
           mime_type?: string | null
@@ -42,9 +48,12 @@ export type Database = {
           user_id: string
         }
         Update: {
+          category?: string | null
           created_at?: string
+          department?: string | null
           file_path?: string | null
           file_size?: number | null
+          folder_path?: string | null
           id?: string
           is_physical?: boolean | null
           mime_type?: string | null
