@@ -12,6 +12,7 @@ const Index = () => {
   const { user, loading } = useAuth();
   const { stats } = useDocuments();
 
+  // Show loading state while contexts are initializing
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -23,6 +24,7 @@ const Index = () => {
     );
   }
 
+  // Show auth page if user is not authenticated
   if (!user) {
     return <AuthPage />;
   }

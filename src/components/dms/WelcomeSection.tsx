@@ -10,7 +10,8 @@ const WelcomeSection = () => {
   const { t } = useLanguage();
   const { stats, refetch } = useDocuments();
 
-  if (!user) return null;
+  // Early return if contexts are not properly initialized or user not authenticated
+  if (!user || !t) return null;
 
   const displayName = profile?.display_name || user.email?.split('@')[0] || 'User';
 
