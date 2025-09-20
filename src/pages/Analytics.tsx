@@ -304,6 +304,71 @@ const Analytics = () => {
                 </div>
               </Card>
             </div>
+
+            {/* Predictive Analytics */}
+            <Card className="p-6 border border-border/50">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingUp className="w-5 h-5 text-muted-foreground" />
+                <h4 className="text-md font-semibold text-foreground">Predictive Analytics & Forecasting</h4>
+              </div>
+              <p className="text-sm text-muted-foreground mb-6">AI-powered predictions for next 6 months</p>
+              
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={forecastData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" className="text-xs" />
+                    <YAxis className="text-xs" />
+                    <Tooltip />
+                    <Line 
+                      type="monotone" 
+                      dataKey="actual" 
+                      stroke="hsl(var(--dms-purple))" 
+                      strokeWidth={2}
+                      dot={{ fill: 'hsl(var(--dms-purple))' }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="predicted" 
+                      stroke="hsl(var(--dms-blue))" 
+                      strokeWidth={2}
+                      strokeDasharray="5 5"
+                      dot={{ fill: 'hsl(var(--dms-blue))' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+
+            {/* AI Insights */}
+            <Card className="p-6 border border-border/50">
+              <div className="flex items-center gap-2 mb-2">
+                <BarChart3 className="w-5 h-5 text-muted-foreground" />
+                <h4 className="text-md font-semibold text-foreground">AI-Generated Business Insights</h4>
+              </div>
+              <p className="text-sm text-muted-foreground mb-6">Automated insights and recommendations</p>
+              
+              <div className="space-y-4">
+                {insights.map((insight, index) => (
+                  <div key={index} className="p-4 border border-border/30 rounded-lg bg-muted/20">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Badge className={`${insight.impactColor} text-white`}>
+                          {insight.impact}
+                        </Badge>
+                        <span className="text-sm text-muted-foreground">{insight.confidence}</span>
+                      </div>
+                    </div>
+                    <h5 className="font-medium text-foreground mb-2">{insight.title}</h5>
+                    <p className="text-sm text-muted-foreground mb-3">{insight.description}</p>
+                    <Button variant="outline" size="sm">
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Details
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </Card>
           </TabsContent>
 
           <TabsContent value="ai-insights" className="space-y-6 mt-6">
