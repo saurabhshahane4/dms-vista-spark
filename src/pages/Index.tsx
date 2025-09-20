@@ -5,6 +5,7 @@ import StatsCard from "@/components/dms/StatsCard";
 import RecentDocuments from "@/components/dms/RecentDocuments";
 import QuickActions from "@/components/dms/QuickActions";
 import Documents from "@/pages/Documents";
+import PhysicalTracking from "@/pages/PhysicalTracking";
 import { FileText, Archive, Clock, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDocuments } from "@/hooks/useDocuments";
@@ -94,13 +95,7 @@ const Index = () => {
 
         {activeTab === 'Documents' && <Documents />}
 
-        {activeTab === 'Physical Tracking' && (
-          <div className="text-center py-12">
-            <Archive className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-foreground mb-2">Physical Tracking</h3>
-            <p className="text-muted-foreground">Track and manage physical document locations and movements.</p>
-          </div>
-        )}
+        {activeTab === 'Physical Tracking' && <PhysicalTracking />}
 
         {activeTab === 'Workflow' && (
           <div className="text-center py-12">

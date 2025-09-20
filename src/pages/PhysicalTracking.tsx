@@ -1,0 +1,216 @@
+import { useState } from "react";
+import { Archive, CheckCircle, User, Package, ScanLine, Download, FileText } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+const physicalStats = {
+  totalFiles: 8234,
+  available: 7891,
+  checkedOut: 298,
+  inTransit: 45
+};
+
+const recentActivity = [
+  {
+    id: "DOC-2024-001",
+    name: "Annual Financial Report 2024",
+    status: "available",
+    location: "A-1-001"
+  },
+  {
+    id: "DOC-2024-002", 
+    name: "Employee Handbook Update",
+    status: "checked-out",
+    location: "B-2-005"
+  },
+  {
+    id: "DOC-2024-003",
+    name: "Contract Agreement - Vendor XYZ", 
+    status: "in-transit",
+    location: "C-1-010"
+  }
+];
+
+const PhysicalTracking = () => {
+  const [activeSubTab, setActiveSubTab] = useState("overview");
+
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'available':
+        return 'bg-green-100 text-green-800';
+      case 'checked-out':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'in-transit':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'available':
+        return <CheckCircle className="w-4 h-4 text-green-600" />;
+      case 'checked-out':
+        return <User className="w-4 h-4 text-yellow-600" />;
+      case 'in-transit':
+        return <Package className="w-4 h-4 text-blue-600" />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-card rounded-lg p-6 border border-border/50">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+            <Archive className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-foreground">Physical Document Tracking</h2>
+            <p className="text-sm text-muted-foreground">Track and manage physical document locations</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-6 border border-border/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">Total Physical Files</p>
+              <p className="text-3xl font-bold text-foreground">{physicalStats.totalFiles.toLocaleString()}</p>
+            </div>
+            <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+              <Archive className="w-6 h-6 text-white" />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6 border border-border/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">Available</p>
+              <p className="text-3xl font-bold text-foreground">{physicalStats.available.toLocaleString()}</p>
+            </div>
+            <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+              <CheckCircle className="w-6 h-6 text-white" />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6 border border-border/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">Checked Out</p>
+              <p className="text-3xl font-bold text-foreground">{physicalStats.checkedOut}</p>
+            </div>
+            <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
+              <User className="w-6 h-6 text-white" />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6 border border-border/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">In Transit</p>
+              <p className="text-3xl font-bold text-foreground">{physicalStats.inTransit}</p>
+            </div>
+            <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+              <Package className="w-6 h-6 text-white" />
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Sub Navigation */}
+      <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="tracking">Document Tracking</TabsTrigger>
+          <TabsTrigger value="locations">Storage Locations</TabsTrigger>
+          <TabsTrigger value="inventory">Inventory</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6 mt-6">
+          {/* Physical Document Overview */}
+          <Card className="p-6 border border-border/50">
+            <div className="flex items-center gap-3 mb-4">
+              <FileText className="w-5 h-5 text-muted-foreground" />
+              <div>
+                <h3 className="text-lg font-semibold text-foreground">Physical Document Overview</h3>
+                <p className="text-sm text-muted-foreground">Monitor and manage physical document locations and status</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mb-6">
+              <Button className="bg-primary hover:bg-primary/90">
+                <ScanLine className="w-4 h-4 mr-2" />
+                Scan Barcode
+              </Button>
+              <Button variant="outline">
+                <Download className="w-4 h-4 mr-2" />
+                Export Report
+              </Button>
+            </div>
+
+            {/* Recent Activity */}
+            <div>
+              <h4 className="text-md font-medium text-foreground mb-4">Recent Activity</h4>
+              <div className="space-y-3">
+                {recentActivity.map((doc) => (
+                  <div key={doc.id} className="flex items-center justify-between p-4 border border-border/30 rounded-lg hover:bg-muted/30 transition-colors">
+                    <div className="flex items-center gap-3">
+                      {getStatusIcon(doc.status)}
+                      <div>
+                        <p className="font-medium text-foreground">{doc.name}</p>
+                        <p className="text-sm text-muted-foreground">{doc.id}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge className={getStatusVariant(doc.status)}>
+                        {doc.status.replace('-', ' ')}
+                      </Badge>
+                      <span className="text-sm font-mono text-muted-foreground">{doc.location}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="tracking" className="space-y-6 mt-6">
+          <div className="text-center py-12">
+            <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">Document Tracking</h3>
+            <p className="text-muted-foreground">Real-time tracking of document movements and check-outs.</p>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="locations" className="space-y-6 mt-6">
+          <div className="text-center py-12">
+            <Archive className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">Storage Locations</h3>
+            <p className="text-muted-foreground">Manage and organize physical storage locations and shelving.</p>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="inventory" className="space-y-6 mt-6">
+          <div className="text-center py-12">
+            <CheckCircle className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">Inventory Management</h3>
+            <p className="text-muted-foreground">Complete inventory audits and reconciliation tools.</p>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default PhysicalTracking;
