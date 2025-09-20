@@ -47,6 +47,21 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // DMS Theme Colors
+        dms: {
+          blue: "hsl(var(--dms-blue))",
+          purple: "hsl(var(--dms-purple))", 
+          green: "hsl(var(--dms-green))",
+          orange: "hsl(var(--dms-orange))",
+          success: "hsl(var(--dms-success))",
+          warning: "hsl(var(--dms-warning))",
+          info: "hsl(var(--dms-info))",
+        },
+        status: {
+          approved: "hsl(var(--status-approved))",
+          pending: "hsl(var(--status-pending))",
+          processing: "hsl(var(--status-processing))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
