@@ -186,11 +186,94 @@ const PhysicalTracking = () => {
         </TabsContent>
 
         <TabsContent value="tracking" className="space-y-6 mt-6">
-          <div className="text-center py-12">
-            <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-foreground mb-2">Document Tracking</h3>
-            <p className="text-muted-foreground">Real-time tracking of document movements and check-outs.</p>
-          </div>
+          <Card className="p-6 border border-border/50">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <Package className="w-5 h-5 text-muted-foreground" />
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">Document Tracking</h3>
+                  <p className="text-sm text-muted-foreground">Track physical document locations and movements</p>
+                </div>
+              </div>
+              <Button className="bg-primary hover:bg-primary/90">
+                <ScanLine className="w-4 h-4 mr-2" />
+                Scan Document
+              </Button>
+            </div>
+
+            <div className="flex gap-4 mb-6">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="Search documents..."
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+              <select className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <option>All Status</option>
+                <option>Available</option>
+                <option>Checked Out</option>
+                <option>In Transit</option>
+              </select>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-4 border border-border/30 rounded-lg hover:bg-muted/30 transition-colors">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <div>
+                    <p className="font-medium text-foreground">Annual Financial Report 2024</p>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>DOC-2024-001</span>
+                      <span>📍 A-1-001</span>
+                      <span>📅 1/15/2024</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Badge className="bg-green-100 text-green-800">available</Badge>
+                  <Button variant="outline" size="sm">Details</Button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-4 border border-border/30 rounded-lg hover:bg-muted/30 transition-colors">
+                <div className="flex items-center gap-3">
+                  <User className="w-4 h-4 text-yellow-600" />
+                  <div>
+                    <p className="font-medium text-foreground">Employee Handbook Update</p>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>DOC-2024-002</span>
+                      <span>📍 B-2-005</span>
+                      <span>👤 sarah.johnson</span>
+                      <span>📅 1/16/2024</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Badge className="bg-yellow-100 text-yellow-800">checked-out</Badge>
+                  <Button variant="outline" size="sm">Details</Button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-4 border border-border/30 rounded-lg hover:bg-muted/30 transition-colors">
+                <div className="flex items-center gap-3">
+                  <Package className="w-4 h-4 text-blue-600" />
+                  <div>
+                    <p className="font-medium text-foreground">Contract Agreement - Vendor XYZ</p>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>DOC-2024-003</span>
+                      <span>📍 C-1-010</span>
+                      <span>📅 1/17/2024</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Badge className="bg-blue-100 text-blue-800">in-transit</Badge>
+                  <Button variant="outline" size="sm">Details</Button>
+                </div>
+              </div>
+            </div>
+          </Card>
         </TabsContent>
 
         <TabsContent value="locations" className="space-y-6 mt-6">
