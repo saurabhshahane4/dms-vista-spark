@@ -33,6 +33,13 @@ export const useDocuments = () => {
   const fetchDocuments = async () => {
     if (!user) {
       setLoading(false);
+      setDocuments([]);
+      setStats({
+        totalDocuments: 0,
+        physicalFiles: 0,
+        pendingApprovals: 0,
+        activeUsers: 0,
+      });
       return;
     }
 
@@ -91,9 +98,12 @@ export const useDocuments = () => {
   };
 
   useEffect(() => {
-    fetchDocuments();
+    // Only run if user context is available
+    if (user !== undefined) {
+      fetchDocuments();
+    }
 
-    // Set up real-time subscription
+    // Set up real-time subscription only when user is available
     if (user) {
       const channel = supabase
         .channel('documents-changes')
