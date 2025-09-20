@@ -69,7 +69,7 @@ serve(async (req) => {
             mime_type: 'text/plain',
             category: category,
             department: department,
-            status: 'hidden', // Hidden placeholder
+            status: 'active', // Use valid status value
             tags: ['folder-placeholder']
           });
 
