@@ -8,6 +8,7 @@ import DocumentUpload from "./DocumentUpload";
 const QuickActions = () => {
   const [scanModalOpen, setScanModalOpen] = useState(false);
   const [reportsModalOpen, setReportsModalOpen] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   const handleScan = () => {
     setScanModalOpen(true);
@@ -15,6 +16,10 @@ const QuickActions = () => {
 
   const handleReports = () => {
     setReportsModalOpen(true);
+  };
+
+  const handleUpload = () => {
+    setUploadModalOpen(true);
   };
 
   const handleAISearch = () => {
@@ -29,8 +34,8 @@ const QuickActions = () => {
     <>
       <Card className="p-6 bg-card shadow-soft border border-border/50">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-dms-purple/10 rounded-lg flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-dms-purple" />
+          <div className="w-10 h-10 bg-dms-purple rounded-lg flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
             <h3 className="text-lg font-semibold text-foreground">Quick Actions</h3>
@@ -38,58 +43,59 @@ const QuickActions = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          {/* Upload Document */}
-          <div className="flex flex-col items-center">
-            <DocumentUpload />
+        <div className="grid grid-cols-2 gap-8 px-4">
+          {/* Upload */}
+          <div className="flex flex-col items-center gap-3">
+            <Button
+              onClick={handleUpload}
+              className="w-12 h-12 rounded-full bg-green-500 hover:bg-green-600 p-0"
+            >
+              <Upload className="w-5 h-5 text-white" />
+            </Button>
+            <span className="text-sm font-medium text-foreground">Upload</span>
           </div>
 
           {/* AI Search */}
-          <Button
-            variant="ghost"
-            className="h-auto p-4 flex flex-col items-center gap-3 hover:bg-muted/50 border border-border/30 hover:border-border/60 transition-colors"
-            onClick={handleAISearch}
-          >
-            <div className="w-12 h-12 rounded-full bg-dms-blue flex items-center justify-center">
-              <Search className="w-6 h-6 text-white" />
-            </div>
-            <div className="text-center">
-              <div className="font-medium text-foreground">AI Search</div>
-              <div className="text-xs text-muted-foreground">Intelligent document search</div>
-            </div>
-          </Button>
+          <div className="flex flex-col items-center gap-3">
+            <Button
+              onClick={handleAISearch}
+              className="w-12 h-12 rounded-full bg-blue-500 hover:bg-blue-600 p-0"
+            >
+              <Search className="w-5 h-5 text-white" />
+            </Button>
+            <span className="text-sm font-medium text-foreground">AI Search</span>
+          </div>
 
           {/* Scan */}
-          <Button
-            variant="ghost"
-            className="h-auto p-4 flex flex-col items-center gap-3 hover:bg-muted/50 border border-border/30 hover:border-border/60 transition-colors"
-            onClick={handleScan}
-          >
-            <div className="w-12 h-12 rounded-full bg-dms-orange flex items-center justify-center">
-              <ScanLine className="w-6 h-6 text-white" />
-            </div>
-            <div className="text-center">
-              <div className="font-medium text-foreground">Scan</div>
-              <div className="text-xs text-muted-foreground">Scan physical documents</div>
-            </div>
-          </Button>
+          <div className="flex flex-col items-center gap-3">
+            <Button
+              onClick={handleScan}
+              className="w-12 h-12 rounded-full bg-orange-500 hover:bg-orange-600 p-0"
+            >
+              <ScanLine className="w-5 h-5 text-white" />
+            </Button>
+            <span className="text-sm font-medium text-foreground">Scan</span>
+          </div>
 
           {/* Reports */}
-          <Button
-            variant="ghost"
-            className="h-auto p-4 flex flex-col items-center gap-3 hover:bg-muted/50 border border-border/30 hover:border-border/60 transition-colors"
-            onClick={handleReports}
-          >
-            <div className="w-12 h-12 rounded-full bg-dms-purple flex items-center justify-center">
-              <BarChart3 className="w-6 h-6 text-white" />
-            </div>
-            <div className="text-center">
-              <div className="font-medium text-foreground">Reports</div>
-              <div className="text-xs text-muted-foreground">Generate reports</div>
-            </div>
-          </Button>
+          <div className="flex flex-col items-center gap-3">
+            <Button
+              onClick={handleReports}
+              className="w-12 h-12 rounded-full bg-purple-500 hover:bg-purple-600 p-0"
+            >
+              <BarChart3 className="w-5 h-5 text-white" />
+            </Button>
+            <span className="text-sm font-medium text-foreground">Reports</span>
+          </div>
         </div>
       </Card>
+
+      {/* Upload Modal */}
+      <Dialog open={uploadModalOpen} onOpenChange={setUploadModalOpen}>
+        <DialogContent>
+          <DocumentUpload onUploadComplete={() => setUploadModalOpen(false)} />
+        </DialogContent>
+      </Dialog>
 
       {/* Scan Modal */}
       <Dialog open={scanModalOpen} onOpenChange={setScanModalOpen}>
@@ -102,7 +108,7 @@ const QuickActions = () => {
               <ScanLine className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">Barcode Scanner</h3>
               <p className="text-muted-foreground mb-4">Position the barcode within the frame to scan</p>
-              <Button className="bg-dms-orange hover:bg-dms-orange/90">
+              <Button className="bg-orange-500 hover:bg-orange-600">
                 <ScanLine className="w-4 h-4 mr-2" />
                 Start Scanning
               </Button>
