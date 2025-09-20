@@ -4,16 +4,54 @@ import { Archive } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useDocuments } from "@/hooks/useDocuments";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 import DocumentUpload from "./DocumentUpload";
 const WelcomeSection = () => {
   const { user, profile } = useAuth();
   const { t } = useLanguage();
   const { stats, refetch } = useDocuments();
+  const { toast } = useToast();
+  const [archiving, setArchiving] = useState(false);
 
   // Early return if contexts are not properly initialized or user not authenticated
   if (!user || !t) return null;
 
   const displayName = profile?.display_name || user.email?.split('@')[0] || 'User';
+
+  const handleArchive = async () => {
+    if (!user) return;
+    
+    setArchiving(true);
+    try {
+      // Archive documents by updating their status to 'archived'
+      const { error } = await supabase
+        .from('documents')
+        .update({ status: 'archived' })
+        .eq('user_id', user.id)
+        .eq('status', 'active');
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: 'Active documents have been archived successfully.',
+      });
+
+      // Refresh the stats to reflect the change
+      refetch();
+    } catch (error) {
+      console.error('Archive error:', error);
+      toast({
+        title: 'Archive Error',
+        description: 'Failed to archive documents. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setArchiving(false);
+    }
+  };
 
   return (
     <div className="px-6 py-8 border-b border-border bg-background">
@@ -48,9 +86,14 @@ const WelcomeSection = () => {
           </div>
 
           <DocumentUpload onUploadComplete={refetch} />
-          <Button variant="outline" className="border-dms-purple text-dms-purple hover:bg-dms-purple/10">
+          <Button 
+            variant="outline" 
+            className="border-dms-purple text-dms-purple hover:bg-dms-purple/10"
+            onClick={handleArchive}
+            disabled={archiving}
+          >
             <Archive className="w-4 h-4 mr-2" />
-            {t('archive')}
+            {archiving ? 'Archiving...' : t('archive')}
           </Button>
         </div>
       </div>

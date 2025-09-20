@@ -81,6 +81,7 @@ const AISearchInput = () => {
         variant="ghost" 
         className="text-muted-foreground hover:text-foreground flex items-center gap-2"
         onClick={() => setIsOpen(true)}
+        data-ai-search-trigger
       >
         <Search className="w-4 h-4" />
         <span className="hidden md:inline">AI Search</span>
