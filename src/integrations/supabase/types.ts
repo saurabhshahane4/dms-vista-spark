@@ -111,8 +111,12 @@ export type Database = {
       documents: {
         Row: {
           category: string | null
+          content_extracted_at: string | null
+          content_text: string | null
           created_at: string
           department: string | null
+          embedding: string | null
+          extraction_status: string | null
           file_path: string | null
           file_size: number | null
           folder_path: string | null
@@ -128,8 +132,12 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          content_extracted_at?: string | null
+          content_text?: string | null
           created_at?: string
           department?: string | null
+          embedding?: string | null
+          extraction_status?: string | null
           file_path?: string | null
           file_size?: number | null
           folder_path?: string | null
@@ -145,8 +153,12 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          content_extracted_at?: string | null
+          content_text?: string | null
           created_at?: string
           department?: string | null
+          embedding?: string | null
+          extraction_status?: string | null
           file_path?: string | null
           file_size?: number | null
           folder_path?: string | null
@@ -333,6 +345,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
       generate_share_token: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -347,6 +363,130 @@ export type Database = {
           total_versions: number
           version_comment: string
         }[]
+      }
+      halfvec_avg: {
+        Args: { "": number[] }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      hnsw_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hybrid_search_documents: {
+        Args: {
+          max_results?: number
+          query_embedding: string
+          search_query: string
+          user_id_param: string
+        }
+        Returns: {
+          content_text: string
+          created_at: string
+          file_path: string
+          id: string
+          name: string
+          search_rank: number
+          status: string
+          tags: string[]
+        }[]
+      }
+      ivfflat_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: unknown
+      }
+      search_documents_by_similarity: {
+        Args: {
+          max_results?: number
+          query_embedding: string
+          similarity_threshold?: number
+          user_id_param: string
+        }
+        Returns: {
+          content_text: string
+          created_at: string
+          file_path: string
+          id: string
+          name: string
+          similarity: number
+          status: string
+          tags: string[]
+        }[]
+      }
+      sparsevec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      vector_avg: {
+        Args: { "": number[] }
+        Returns: string
+      }
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
+      }
+      vector_norm: {
+        Args: { "": string }
+        Returns: number
+      }
+      vector_out: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: { "": string }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
     }
     Enums: {

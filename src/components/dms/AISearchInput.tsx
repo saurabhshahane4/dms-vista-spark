@@ -9,9 +9,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface SearchResult {
-  documents: any[];
-  aiSummary?: string;
+  response: string;
+  documents: {
+    id: string;
+    name: string;
+    status: string;
+    created_at: string;
+    tags: string[];
+    similarity?: string | number;
+  }[];
+  searchMethod: string;
   totalResults: number;
+  hasContent: boolean;
 }
 
 const AISearchInput = () => {
@@ -23,10 +32,11 @@ const AISearchInput = () => {
   const { toast } = useToast();
 
   const suggestedQueries = [
-    "Show me recent contracts",
-    "Find financial reports from Q4", 
-    "Search for safety documents",
-    "What documents need approval?"
+    "What contracts are pending approval?",
+    "Show me financial reports from this quarter", 
+    "Find safety and compliance documents",
+    "What are the key points in our HR policies?",
+    "Summarize recent meeting minutes"
   ];
 
   const handleSearch = async (searchQuery: string) => {
@@ -44,6 +54,24 @@ const AISearchInput = () => {
       if (error) throw error;
 
       setResults(data);
+      
+      // Trigger content extraction for documents that haven't been processed
+      if (data.documents && data.documents.length > 0) {
+        data.documents.forEach(async (doc: any) => {
+          // Check if document needs content extraction (in background)
+          try {
+            await supabase.functions.invoke('extract-document-content', {
+              body: { documentId: doc.id },
+              headers: {
+                Authorization: `Bearer ${session.access_token}`,
+              },
+            });
+          } catch (extractError) {
+            // Silent fail for background extraction
+            console.log('Background content extraction initiated for:', doc.name);
+          }
+        });
+      }
     } catch (error) {
       console.error('Search error:', error);
       toast({
@@ -115,7 +143,7 @@ const AISearchInput = () => {
                 </div>
                 <div className="bg-muted/50 rounded-lg p-4 max-w-lg">
                   <p className="text-sm text-foreground mb-4">
-                    Hello! I'm your document search assistant. Ask me anything about your documents - I can search by content, date, department, or any other criteria.
+                    Hello! I'm your intelligent document assistant with RAG capabilities. I can search through your document contents and provide contextual answers based on what's actually in your files.
                   </p>
                   
                   {/* Suggested Queries */}
@@ -147,37 +175,60 @@ const AISearchInput = () => {
 
               {results && (
                 <div className="space-y-4">
-                  {results.aiSummary && (
+                  {/* AI RAG Response */}
+                  {results.response && (
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
                         <Sparkles className="w-4 h-4 text-dms-blue" />
                       </div>
-                      <div className="bg-muted/50 rounded-lg p-4 max-w-lg">
-                        <p className="text-sm text-foreground">{results.aiSummary}</p>
+                      <div className="bg-muted/50 rounded-lg p-4 flex-1">
+                        <p className="text-sm text-foreground whitespace-pre-wrap">{results.response}</p>
+                        <div className="flex items-center gap-2 mt-3 pt-2 border-t border-border/30">
+                          <Badge variant="secondary" className="text-xs">
+                            {results.searchMethod === 'hybrid' ? '🧠 Semantic + Keyword' : '🔍 Keyword Search'}
+                          </Badge>
+                          {results.hasContent && (
+                            <Badge variant="outline" className="text-xs">
+                              📄 Content-aware
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
 
+                  {/* Source Documents */}
                   {results.documents.length > 0 && (
                     <div className="space-y-2">
-                      <p className="text-sm font-medium text-foreground">
-                        Found {results.totalResults} document{results.totalResults !== 1 ? 's' : ''}:
+                      <p className="text-sm font-medium text-foreground flex items-center gap-2">
+                        📚 Source Documents ({results.totalResults}):
                       </p>
-                      {results.documents.slice(0, 5).map((doc) => (
+                      {results.documents.map((doc) => (
                         <div key={doc.id} className="p-3 border border-border/30 rounded-lg">
-                          <h4 className="font-medium text-foreground text-sm">{doc.name}</h4>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="secondary" className="text-xs">
-                              {new Date(doc.created_at).toLocaleDateString()}
-                            </Badge>
-                            {doc.tags && doc.tags.length > 0 && (
-                              <Badge variant="outline" className="text-xs">
-                                {doc.tags[0]}
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h4 className="font-medium text-foreground text-sm">{doc.name}</h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="outline" className="text-xs">
+                                  {new Date(doc.created_at).toLocaleDateString()}
+                                </Badge>
+                                {doc.tags && doc.tags.length > 0 && (
+                                  <Badge variant="outline" className="text-xs">
+                                    {doc.tags[0]}
+                                  </Badge>
+                                )}
+                                <Badge variant="outline" className="text-xs">
+                                  {doc.status}
+                                </Badge>
+                              </div>
+                            </div>
+                            {doc.similarity && doc.similarity !== 'N/A' && (
+                              <Badge variant="secondary" className="text-xs ml-2">
+                                {typeof doc.similarity === 'number' 
+                                  ? `${(doc.similarity * 100).toFixed(0)}%` 
+                                  : doc.similarity}
                               </Badge>
                             )}
-                            <Badge variant="outline" className="text-xs">
-                              {doc.status}
-                            </Badge>
                           </div>
                         </div>
                       ))}
@@ -199,7 +250,7 @@ const AISearchInput = () => {
             <div className="mt-4 pt-4 border-t border-border/50">
               <div className="flex items-center gap-2">
                 <Input
-                  placeholder="Ask about your documents..."
+                  placeholder="Ask questions about your documents..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyPress={handleKeyPress}
