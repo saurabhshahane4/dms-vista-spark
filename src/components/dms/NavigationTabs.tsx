@@ -1,13 +1,27 @@
-import { useState } from "react";
+import { useNavigation } from "@/contexts/NavigationContext";
+
 const NavigationTabs = () => {
-  const [activeTab, setActiveTab] = useState("Dashboard");
-  const tabs = ["Dashboard", "Documents", "Physical Tracking", "Workflow", "Analytics"];
-  return <nav className="border-b border-border px-6 bg-slate-100">
+  const { activeTab, setActiveTab } = useNavigation();
+  const tabs = ["Dashboard", "Documents", "Physical Tracking", "Workflow", "Analytics"] as const;
+  
+  return (
+    <nav className="border-b border-border px-6 bg-muted/30">
       <div className="flex gap-8">
-        {tabs.map(tab => <button key={tab} onClick={() => setActiveTab(tab)} className={`py-4 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === tab ? "border-dms-blue text-dms-blue" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+        {tabs.map(tab => (
+          <button 
+            key={tab} 
+            onClick={() => setActiveTab(tab)} 
+            className={`py-4 px-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === tab 
+                ? "border-dms-blue text-dms-blue" 
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
             {tab}
-          </button>)}
+          </button>
+        ))}
       </div>
-    </nav>;
+    </nav>
+  );
 };
 export default NavigationTabs;
