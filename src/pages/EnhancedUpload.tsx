@@ -149,7 +149,30 @@ const EnhancedUpload = () => {
 
       if (uploadError) throw uploadError;
 
-      // Create document record
+      // Process document with AI
+      const { data: aiAnalysis, error: aiError } = await supabase.functions.invoke('ai-document-processor', {
+        body: { 
+          fileName,
+          documentType: selectedType,
+          documentTitle 
+        },
+        headers: {
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
+      });
+
+      let analysisResult = null;
+      if (!aiError && aiAnalysis?.success) {
+        analysisResult = aiAnalysis.analysis;
+        toast({
+          title: 'AI Analysis Complete',
+          description: 'Document has been analyzed with AI insights.',
+        });
+      } else {
+        console.warn('AI processing failed, proceeding without AI analysis:', aiError);
+      }
+
+      // Create document record with AI analysis
       const tagsArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
       
       const { error: dbError } = await supabase
@@ -171,7 +194,9 @@ const EnhancedUpload = () => {
       setTimeout(() => {
         toast({
           title: 'Success',
-          description: 'Document uploaded and processed successfully!',
+          description: analysisResult 
+            ? 'Document uploaded and processed with AI analysis!'
+            : 'Document uploaded successfully!',
         });
         handleBackToDashboard();
       }, 2000);
