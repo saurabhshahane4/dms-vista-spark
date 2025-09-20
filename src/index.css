@@ -116,4 +116,55 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* DOCX Document Styles */
+  .prose {
+    color: hsl(var(--foreground));
+  }
+  
+  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    color: hsl(var(--foreground));
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .prose p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+  
+  .prose ul, .prose ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+  
+  .prose li {
+    margin-bottom: 0.25rem;
+  }
+  
+  .prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+  }
+  
+  .prose th, .prose td {
+    border: 1px solid hsl(var(--border));
+    padding: 0.5rem;
+    text-align: left;
+  }
+  
+  .prose th {
+    background-color: hsl(var(--muted));
+    font-weight: 600;
+  }
+  
+  .prose strong, .prose b {
+    font-weight: 600;
+  }
+  
+  .prose em, .prose i {
+    font-style: italic;
+  }
 }

@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { DocumentVersionHistory } from "./DocumentVersionHistory";
 import { DocumentSharing } from "./DocumentSharing";
+import mammoth from "mammoth";
 
 interface DocumentPreviewProps {
   documentId: string | null;
@@ -29,6 +30,7 @@ interface DocumentData {
 export const DocumentPreview = ({ documentId, isOpen, onClose }: DocumentPreviewProps) => {
   const [document, setDocument] = useState<DocumentData | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [docxContent, setDocxContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
@@ -60,14 +62,19 @@ export const DocumentPreview = ({ documentId, isOpen, onClose }: DocumentPreview
 
       setDocument(data);
       
-      // Get signed URL for preview
-      if (data.file_path) {
-        const { data: urlData, error: urlError } = await supabase.storage
-          .from('documents')
-          .createSignedUrl(data.file_path, 3600);
-        
-        if (urlError) throw urlError;
-        setPreviewUrl(urlData.signedUrl);
+      // Handle DOCX files differently
+      if (data.mime_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        await loadDocxContent(data.file_path);
+      } else {
+        // Get signed URL for preview
+        if (data.file_path) {
+          const { data: urlData, error: urlError } = await supabase.storage
+            .from('documents')
+            .createSignedUrl(data.file_path, 3600);
+          
+          if (urlError) throw urlError;
+          setPreviewUrl(urlData.signedUrl);
+        }
       }
     } catch (error) {
       console.error('Error fetching document:', error);
@@ -115,6 +122,27 @@ export const DocumentPreview = ({ documentId, isOpen, onClose }: DocumentPreview
     }
   };
 
+  const loadDocxContent = async (filePath: string) => {
+    try {
+      const { data: fileBlob, error } = await supabase.storage
+        .from('documents')
+        .download(filePath);
+      
+      if (error) throw error;
+      
+      const arrayBuffer = await fileBlob.arrayBuffer();
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+      setDocxContent(result.value);
+      
+      if (result.messages.length > 0) {
+        console.warn('DOCX conversion warnings:', result.messages);
+      }
+    } catch (error) {
+      console.error('Error loading DOCX content:', error);
+      setError('Failed to load document content');
+    }
+  };
+
   const renderPreview = () => {
     if (!document || !previewUrl) return null;
 
@@ -145,6 +173,31 @@ export const DocumentPreview = ({ documentId, isOpen, onClose }: DocumentPreview
             title={document.name}
           />
         </div>
+      );
+    }
+
+    if (mime_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-6 max-w-4xl mx-auto">
+            {docxContent ? (
+              <div 
+                className="prose prose-sm max-w-none dark:prose-invert"
+                dangerouslySetInnerHTML={{ __html: docxContent }}
+                style={{
+                  fontSize: `${zoom}%`,
+                  transform: `scale(${zoom / 100})`,
+                  transformOrigin: 'top left',
+                  transition: 'transform 0.2s ease'
+                }}
+              />
+            ) : (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
       );
     }
 
@@ -203,7 +256,8 @@ export const DocumentPreview = ({ documentId, isOpen, onClose }: DocumentPreview
               </div>
               
               <div className="flex items-center gap-2">
-                {document?.mime_type?.startsWith('image/') && (
+                {(document?.mime_type?.startsWith('image/') || 
+                  document?.mime_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') && (
                   <>
                     <Button
                       variant="outline"
@@ -224,13 +278,15 @@ export const DocumentPreview = ({ documentId, isOpen, onClose }: DocumentPreview
                     >
                       <ZoomIn className="w-4 h-4" />
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setRotation((prev) => (prev + 90) % 360)}
-                    >
-                      <RotateCw className="w-4 h-4" />
-                    </Button>
+                    {document?.mime_type?.startsWith('image/') && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setRotation((prev) => (prev + 90) % 360)}
+                      >
+                        <RotateCw className="w-4 h-4" />
+                      </Button>
+                    )}
                   </>
                 )}
                 

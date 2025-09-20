@@ -394,7 +394,10 @@ const Documents = () => {
           (filterType === "office" && (
             doc.mime_type?.includes("document") || 
             doc.mime_type?.includes("sheet") || 
-            doc.mime_type?.includes("presentation")
+            doc.mime_type?.includes("presentation") ||
+            doc.mime_type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+            doc.mime_type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+            doc.mime_type === "application/vnd.openxmlformats-officedocument.presentationml.presentation"
           ));
         
         return matchesSearch && matchesType;
@@ -402,7 +405,9 @@ const Documents = () => {
       .map(doc => ({
         id: doc.id,
         name: doc.name,
-        type: doc.mime_type?.split('/').pop() || 'unknown',
+        type: doc.mime_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+          ? 'DOCX' 
+          : doc.mime_type?.split('/').pop() || 'unknown',
         date: new Date(doc.created_at).toLocaleDateString(),
         size: doc.file_size ? `${(doc.file_size / 1024 / 1024).toFixed(2)} MB` : 'Unknown'
       }));
