@@ -92,7 +92,7 @@ const Documents = () => {
   const [copyTargetName, setCopyTargetName] = useState("");
   const [operationLoading, setOperationLoading] = useState(false);
   
-  const { folders, loading, refetch } = useDocuments();
+  const { folders, allFolders, loading, refetch, currentFolderId, breadcrumb, navigateToFolder } = useDocuments();
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -112,10 +112,10 @@ const Documents = () => {
 
   // Folder Management Functions
   const handleAddFolder = async () => {
-    if (!newFolderName.trim() || !newFolderCategory || !newFolderDepartment || !user) {
+    if (!newFolderName.trim() || !user) {
       toast({
         title: 'Error',
-        description: 'Please fill in all fields',
+        description: 'Please enter a valid folder name',
         variant: 'destructive'
       });
       return;
@@ -127,8 +127,7 @@ const Documents = () => {
         body: { 
           operation: 'create',
           folderName: newFolderName,
-          category: newFolderCategory,
-          department: newFolderDepartment
+          parentFolderId: currentFolderId
         },
         headers: {
           Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
@@ -317,47 +316,9 @@ const Documents = () => {
     }
   };
 
-  const getCurrentFolders = () => {
-    return folders.filter(folder =>
-      folder.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  };
-
-  const getCurrentDocuments = (): DocumentData[] => {
-    if (currentFolder !== null && folders[currentFolder]) {
-      const folder = folders[currentFolder];
-      
-      return folder.documents
-        .filter(doc => {
-          const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase());
-          const matchesType = filterType === "all" || 
-            (filterType === "pdf" && doc.mime_type === "application/pdf") ||
-            (filterType === "images" && doc.mime_type?.startsWith("image/")) ||
-            (filterType === "office" && (
-              doc.mime_type?.includes("document") || 
-              doc.mime_type?.includes("sheet") || 
-              doc.mime_type?.includes("presentation")
-            ));
-          
-          return matchesSearch && matchesType;
-        })
-        .map(doc => ({
-          id: doc.id,
-          name: doc.name,
-          type: doc.mime_type?.split('/').pop() || 'unknown',
-          date: new Date(doc.created_at).toLocaleDateString(),
-          size: doc.file_size ? `${(doc.file_size / 1024 / 1024).toFixed(2)} MB` : 'Unknown'
-        }));
-    }
-    return [];
-  };
-
   const handleFolderClick = (folderIndex: number) => {
-    setCurrentFolder(folderIndex);
-  };
-
-  const handleBackClick = () => {
-    setCurrentFolder(null);
+    const folder = folders[folderIndex];
+    navigateToFolder(folder.id, folder.name);
   };
 
   const getIconComponent = (iconName: string) => {
@@ -372,9 +333,39 @@ const Documents = () => {
     );
   }
 
-  const isInFolder = currentFolder !== null;
-  const currentFolderData = isInFolder ? folders[currentFolder] : null;
-  const displayFolders = getCurrentFolders();
+  const isAtRoot = currentFolderId === null;
+  const displayFolders = folders.filter(folder =>
+    folder.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  // Get documents for current folder
+  const getCurrentDocuments = () => {
+    const currentFolder = allFolders.find(f => f.id === currentFolderId);
+    if (!currentFolder) return [];
+    
+    return currentFolder.documents
+      .filter(doc => {
+        const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesType = filterType === "all" || 
+          (filterType === "pdf" && doc.mime_type === "application/pdf") ||
+          (filterType === "images" && doc.mime_type?.startsWith("image/")) ||
+          (filterType === "office" && (
+            doc.mime_type?.includes("document") || 
+            doc.mime_type?.includes("sheet") || 
+            doc.mime_type?.includes("presentation")
+          ));
+        
+        return matchesSearch && matchesType;
+      })
+      .map(doc => ({
+        id: doc.id,
+        name: doc.name,
+        type: doc.mime_type?.split('/').pop() || 'unknown',
+        date: new Date(doc.created_at).toLocaleDateString(),
+        size: doc.file_size ? `${(doc.file_size / 1024 / 1024).toFixed(2)} MB` : 'Unknown'
+      }));
+  };
+
   const documents = getCurrentDocuments();
 
   return (
@@ -387,11 +378,11 @@ const Documents = () => {
           </div>
           <div>
             <h2 className="text-xl font-semibold text-foreground">
-              {isInFolder ? currentFolderData?.name : 'Document Cabinet'}
+              {!isAtRoot ? breadcrumb[breadcrumb.length - 1]?.name : 'Document Cabinet'}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {isInFolder 
-                ? `Browse documents in ${currentFolderData?.name}` 
+              {!isAtRoot 
+                ? `Browse documents in ${breadcrumb[breadcrumb.length - 1]?.name}` 
                 : 'Browse and manage your digital document archive with hierarchical organization'
               }
             </p>
@@ -399,26 +390,37 @@ const Documents = () => {
         </div>
 
         {/* Breadcrumb */}
-        {isInFolder && (
-          <div className="flex items-center gap-2 mb-4">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleBackClick}
-              className="text-dms-blue hover:text-dms-blue/80"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Folders
-            </Button>
-          </div>
-        )}
+        <div className="flex items-center gap-2 mb-4">
+          {breadcrumb.map((crumb, index) => (
+            <div key={crumb.id || 'root'} className="flex items-center gap-2">
+              {index > 0 && <span className="text-muted-foreground">/</span>}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigateToFolder(crumb.id, crumb.name)}
+                className={`text-dms-blue hover:text-dms-blue/80 ${
+                  index === breadcrumb.length - 1 ? 'font-medium' : ''
+                }`}
+              >
+                {index === 0 ? (
+                  <>
+                    <FolderOpen className="w-4 h-4 mr-2" />
+                    {crumb.name}
+                  </>
+                ) : (
+                  crumb.name
+                )}
+              </Button>
+            </div>
+          ))}
+        </div>
 
         {/* Search and Filters */}
         <div className="flex items-center gap-4 mt-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder={isInFolder ? "Search documents..." : "Search documents and folders..."}
+              placeholder={!isAtRoot ? "Search documents..." : "Search documents and folders..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -461,7 +463,7 @@ const Documents = () => {
       {/* Content Section */}
       <div>
         <div className="flex items-center gap-2 mb-4">
-          {isInFolder ? (
+          {!isAtRoot ? (
             <>
               <FileText className="w-5 h-5 text-muted-foreground" />
               <h3 className="text-lg font-medium text-foreground">Documents ({documents.length})</h3>
@@ -544,7 +546,7 @@ const Documents = () => {
           )}
         </div>
 
-        {isInFolder ? (
+        {!isAtRoot ? (
           // Document view
           <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>
             {documents.map((doc) => (
@@ -667,9 +669,9 @@ const Documents = () => {
           </div>
         )}
 
-        {(isInFolder ? documents.length === 0 : displayFolders.length === 0) && (
+        {(!isAtRoot ? documents.length === 0 : displayFolders.length === 0) && (
           <div className="text-center py-8">
-            {isInFolder ? (
+            {!isAtRoot ? (
               <>
                 <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">No documents found matching your search.</p>

@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { operation, folderName, newFolderName, category, department } = await req.json();
+    const { operation, folderName, newFolderName, parentFolderId } = await req.json();
     
     if (!operation) {
       return new Response(JSON.stringify({ error: 'Operation is required' }), {
@@ -22,7 +22,7 @@ serve(async (req) => {
       });
     }
 
-    console.log('Folder operation:', { operation, folderName, newFolderName, category, department });
+    console.log('Folder operation:', { operation, folderName, newFolderName, parentFolderId });
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -51,33 +51,30 @@ serve(async (req) => {
 
     switch (operation) {
       case 'create':
-        if (!folderName || !category || !department) {
-          return new Response(JSON.stringify({ error: 'Folder name, category, and department are required' }), {
+        if (!folderName) {
+          return new Response(JSON.stringify({ error: 'Folder name is required' }), {
             status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
         }
 
-        // Create a placeholder document to establish the folder structure
-        const { error: createError } = await supabase
-          .from('documents')
+        // Create folder in the folders table
+        const { data: newFolder, error: createError } = await supabase
+          .from('folders')
           .insert({
             user_id: user.id,
-            name: `.folder_placeholder_${Date.now()}`,
-            file_path: `${user.id}/${department}/${category}/.placeholder`,
-            file_size: 0,
-            mime_type: 'text/plain',
-            category: category,
-            department: department,
-            status: 'active',
-            tags: [category.toLowerCase().replace(/\s+/g, '-'), 'folder-placeholder']
-          });
+            name: folderName,
+            parent_folder_id: parentFolderId || null
+          })
+          .select()
+          .single();
 
         if (createError) throw createError;
 
         return new Response(JSON.stringify({ 
           success: true, 
-          message: `Folder "${folderName}" created successfully` 
+          message: `Folder "${folderName}" created successfully`,
+          folder: newFolder
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -90,73 +87,27 @@ serve(async (req) => {
           });
         }
 
-        // Update all documents in this folder to have the new category name
+        // Update folder name in folders table
         const { error: renameError } = await supabase
+          .from('folders')
+          .update({ name: newFolderName })
+          .eq('user_id', user.id)
+          .eq('name', folderName);
+
+        if (renameError) throw renameError;
+
+        // Update documents that reference this folder
+        const { error: updateDocsError } = await supabase
           .from('documents')
-          .update({ category: newFolderName })
+          .update({ folder_path: newFolderName })
           .eq('user_id', user.id)
           .eq('folder_path', folderName);
 
-        if (renameError) throw renameError;
+        if (updateDocsError) throw updateDocsError;
 
         return new Response(JSON.stringify({ 
           success: true, 
           message: `Folder renamed to "${newFolderName}"` 
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-
-      case 'copy':
-        if (!folderName || !newFolderName) {
-          return new Response(JSON.stringify({ error: 'Source and target folder names are required' }), {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
-        }
-
-        // Get all documents in the source folder
-        const { data: documentsToyCopy, error: fetchError } = await supabase
-          .from('documents')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('folder_path', folderName);
-
-        if (fetchError) throw fetchError;
-
-        // Create copies of all documents with new category
-        if (documentsToyCopy && documentsToyCopy.length > 0) {
-          const newDocuments = documentsToyCopy.map(doc => ({
-            user_id: doc.user_id,
-            name: `Copy of ${doc.name}`,
-            file_path: doc.file_path?.replace(folderName, newFolderName),
-            file_size: doc.file_size,
-            mime_type: doc.mime_type,
-            category: newFolderName,
-            department: doc.department,
-            status: doc.status,
-            is_physical: doc.is_physical,
-            tags: doc.tags
-          }));
-
-          const { error: insertError } = await supabase
-            .from('documents')
-            .insert(newDocuments);
-
-          if (insertError) throw insertError;
-
-          return new Response(JSON.stringify({ 
-            success: true, 
-            message: `Folder copied as "${newFolderName}" with ${newDocuments.length} documents`,
-            documentCount: newDocuments.length
-          }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
-        }
-
-        return new Response(JSON.stringify({ 
-          success: true, 
-          message: `Empty folder copied as "${newFolderName}"`,
-          documentCount: 0
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -169,15 +120,31 @@ serve(async (req) => {
           });
         }
 
-        // Move all documents in this folder to "General" category
-        const { error: deleteError } = await supabase
-          .from('documents')
-          .update({ 
-            category: 'General',
-            status: 'active' // Make sure they're not hidden
-          })
+        // Get the folder to delete
+        const { data: folderToDelete, error: fetchFolderError } = await supabase
+          .from('folders')
+          .select('*')
           .eq('user_id', user.id)
-          .eq('folder_path', folderName);
+          .eq('name', folderName)
+          .single();
+
+        if (fetchFolderError) throw fetchFolderError;
+
+        // Move documents to General folder
+        const { error: moveDocsError } = await supabase
+          .from('documents')
+          .update({ folder_path: 'General' })
+          .eq('user_id', user.id)
+          .eq('folder_path', folderToDelete.full_path);
+
+        if (moveDocsError) throw moveDocsError;
+
+        // Delete the folder
+        const { error: deleteError } = await supabase
+          .from('folders')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('id', folderToDelete.id);
 
         if (deleteError) throw deleteError;
 
