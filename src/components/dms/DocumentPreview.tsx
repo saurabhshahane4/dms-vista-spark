@@ -50,6 +50,8 @@ export const DocumentPreview = ({ documentId, isOpen, onClose }: DocumentPreview
     
     setLoading(true);
     setError(null);
+    setDocxContent(null); // Reset DOCX content
+    setPreviewUrl(null); // Reset preview URL
     
     try {
       const { data, error } = await supabase
@@ -63,7 +65,9 @@ export const DocumentPreview = ({ documentId, isOpen, onClose }: DocumentPreview
       setDocument(data);
       
       // Handle DOCX files differently
-      if (data.mime_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      if (data.mime_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
+          data.name.toLowerCase().endsWith('.docx')) {
+        console.log('Detected DOCX file:', data.name, 'mime_type:', data.mime_type);
         await loadDocxContent(data.file_path);
       } else {
         // Get signed URL for preview
@@ -124,14 +128,17 @@ export const DocumentPreview = ({ documentId, isOpen, onClose }: DocumentPreview
 
   const loadDocxContent = async (filePath: string) => {
     try {
+      console.log('Loading DOCX file:', filePath);
       const { data: fileBlob, error } = await supabase.storage
         .from('documents')
         .download(filePath);
       
       if (error) throw error;
       
+      console.log('Downloaded DOCX file, size:', fileBlob.size);
       const arrayBuffer = await fileBlob.arrayBuffer();
       const result = await mammoth.convertToHtml({ arrayBuffer });
+      console.log('DOCX conversion result:', result.value.length, 'characters');
       setDocxContent(result.value);
       
       if (result.messages.length > 0) {
@@ -176,24 +183,35 @@ export const DocumentPreview = ({ documentId, isOpen, onClose }: DocumentPreview
       );
     }
 
-    if (mime_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+    if (mime_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
+        document.name.toLowerCase().endsWith('.docx')) {
+      console.log('Rendering DOCX content, length:', docxContent?.length);
       return (
         <ScrollArea className="h-full">
           <div className="p-6 max-w-4xl mx-auto">
             {docxContent ? (
-              <div 
-                className="prose prose-sm max-w-none dark:prose-invert"
-                dangerouslySetInnerHTML={{ __html: docxContent }}
-                style={{
-                  fontSize: `${zoom}%`,
-                  transform: `scale(${zoom / 100})`,
-                  transformOrigin: 'top left',
-                  transition: 'transform 0.2s ease'
-                }}
-              />
+              <div className="bg-card p-8 rounded-lg shadow-sm min-h-[600px] border border-border">
+                <div 
+                  className="prose prose-lg max-w-none text-foreground [&_h1]:text-foreground [&_h2]:text-foreground [&_h3]:text-foreground [&_h4]:text-foreground [&_h5]:text-foreground [&_h6]:text-foreground [&_p]:text-foreground [&_li]:text-foreground [&_td]:text-foreground [&_th]:text-foreground"
+                  dangerouslySetInnerHTML={{ __html: docxContent }}
+                  style={{
+                    fontSize: `${zoom}%`,
+                    lineHeight: '1.6'
+                  }}
+                />
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <p className="text-destructive mb-4">{error}</p>
+                <Button onClick={handleDownload} className="gap-2">
+                  <Download className="w-4 h-4" />
+                  Download to view
+                </Button>
+              </div>
             ) : (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+                <p className="text-muted-foreground">Converting document...</p>
               </div>
             )}
           </div>
