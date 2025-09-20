@@ -2,10 +2,8 @@ import { Search, Globe, Moon, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
 const Header = () => {
-  return (
-    <header className="bg-card border-b border-border px-6 py-4">
+  return <header className="border-b border-border px-6 py-4 bg-gray-50">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-dms-purple to-dms-blue rounded-lg">
@@ -24,10 +22,7 @@ const Header = () => {
         <div className="flex items-center gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input 
-              placeholder="AI Search" 
-              className="pl-10 w-64 bg-background border-border"
-            />
+            <Input placeholder="AI Search" className="pl-10 w-64 bg-background border-border" />
           </div>
           
           <Button variant="ghost" size="sm" className="text-muted-foreground">
@@ -44,8 +39,6 @@ const Header = () => {
           </Avatar>
         </div>
       </div>
-    </header>
-  );
+    </header>;
 };
-
 export default Header;

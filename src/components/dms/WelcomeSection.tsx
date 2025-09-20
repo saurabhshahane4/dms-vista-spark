@@ -1,10 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Archive } from "lucide-react";
-
 const WelcomeSection = () => {
-  return (
-    <div className="bg-muted/30 px-6 py-8 border-b border-border">
+  return <div className="px-6 py-8 border-b border-border bg-slate-100">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -43,8 +41,6 @@ const WelcomeSection = () => {
           </Button>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default WelcomeSection;
