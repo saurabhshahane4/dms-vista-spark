@@ -65,6 +65,7 @@ serve(async (req) => {
             user_id: user.id,
             name: `.folder_placeholder_${Date.now()}`,
             file_path: `${user.id}/${department}/${category}/.placeholder`,
+            folder_path: category,
             file_size: 0,
             mime_type: 'text/plain',
             category: category,

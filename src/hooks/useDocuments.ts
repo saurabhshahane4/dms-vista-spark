@@ -143,8 +143,8 @@ export const useDocuments = () => {
           documentCount: folderDocs.length,
           documents: folderDocs,
           category: folderDocs[0]?.category || 'General',
-          icon: getFolderIcon(folderName),
-          iconBg: getFolderColor(folderName),
+          icon: getFolderIcon(folderDocs[0]?.category || folderName),
+          iconBg: getFolderColor(folderDocs[0]?.category || folderName),
           modified: new Date(mostRecentDate).toLocaleDateString(),
           tags: Array.from(allTags).slice(0, 3) // Show max 3 tags
         };
