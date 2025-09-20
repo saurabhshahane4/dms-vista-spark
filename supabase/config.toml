@@ -8,3 +8,9 @@ verify_jwt = true
 
 [functions.folder-operations]
 verify_jwt = true
+
+[functions.storage-management]
+verify_jwt = true
+
+[functions.document-operations]
+verify_jwt = true

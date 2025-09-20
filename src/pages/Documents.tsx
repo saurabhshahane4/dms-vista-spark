@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Grid3X3, List, FolderOpen, Building2, MapPin, ArrowLeft, FileText, DollarSign, Scale, Users, Megaphone, BarChart3, Image, Headphones, Video, Archive, Folder, Sheet, Plus, MoreVertical, Edit, Trash2, Copy, FolderPlus } from "lucide-react";
+import { Search, Grid3X3, List, FolderOpen, Building2, MapPin, ArrowLeft, FileText, DollarSign, Scale, Users, Megaphone, BarChart3, Image, Headphones, Video, Archive, Folder, Sheet, Plus, MoreVertical, Edit, Trash2, Copy, FolderPlus, Eye, CheckSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,6 +13,8 @@ import { useDocuments } from "@/hooks/useDocuments";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { DocumentPreview } from "@/components/dms/DocumentPreview";
+import { BulkOperationsPanel } from "@/components/dms/BulkOperationsPanel";
 
 // Map icon names to actual icon components
 const iconComponents = {
@@ -79,6 +81,12 @@ const Documents = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [filterType, setFilterType] = useState("all");
   const [currentFolder, setCurrentFolder] = useState<number | null>(null);
+  
+  // Advanced document operations states
+  const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
+  const [previewDocumentId, setPreviewDocumentId] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
   
   // Folder management states
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -325,6 +333,40 @@ const Documents = () => {
     return iconComponents[iconName as keyof typeof iconComponents] || Folder;
   };
 
+  // Advanced document operations handlers
+  const toggleDocumentSelection = (documentId: string) => {
+    setSelectedDocuments(prev => 
+      prev.includes(documentId) 
+        ? prev.filter(id => id !== documentId)
+        : [...prev, documentId]
+    );
+  };
+
+  const selectAllDocuments = () => {
+    const allDocumentIds = documents.map(doc => doc.id);
+    setSelectedDocuments(allDocumentIds);
+  };
+
+  const clearSelection = () => {
+    setSelectedDocuments([]);
+    setSelectionMode(false);
+  };
+
+  const handleDocumentClick = (documentId: string, event: React.MouseEvent) => {
+    if (selectionMode) {
+      event.preventDefault();
+      toggleDocumentSelection(documentId);
+    } else {
+      setPreviewDocumentId(documentId);
+      setShowPreview(true);
+    }
+  };
+
+  const handleOperationComplete = () => {
+    clearSelection();
+    refetch();
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -426,6 +468,34 @@ const Documents = () => {
               className="pl-10"
             />
           </div>
+          
+          {!isAtRoot && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant={selectionMode ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setSelectionMode(!selectionMode);
+                  if (!selectionMode) clearSelection();
+                }}
+                className="gap-2"
+              >
+                <CheckSquare className="w-4 h-4" />
+                {selectionMode ? 'Done' : 'Select'}
+              </Button>
+              
+              {selectionMode && documents.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={selectAllDocuments}
+                  className="gap-2"
+                >
+                  Select All
+                </Button>
+              )}
+            </div>
+          )}
           
           <Select value={filterType} onValueChange={setFilterType}>
             <SelectTrigger className="w-40">
@@ -552,11 +622,32 @@ const Documents = () => {
             {documents.map((doc) => (
               <Card 
                 key={doc.id} 
-                className="p-4 hover:shadow-md transition-shadow border border-border/50"
+                className={`p-4 hover:shadow-md transition-all cursor-pointer border border-border/50 ${
+                  selectedDocuments.includes(doc.id) ? 'bg-primary/5 border-primary' : ''
+                } ${selectionMode ? 'hover:bg-primary/10' : ''}`}
+                onClick={(e) => handleDocumentClick(doc.id, e)}
               >
                 <div className={viewMode === "grid" ? "space-y-3" : "flex items-center gap-4"}>
-                  <div className="w-12 h-12 bg-dms-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-dms-blue/10 rounded-lg flex items-center justify-center flex-shrink-0 relative">
                     <FileText className="w-6 h-6 text-dms-blue" />
+                    {selectionMode && (
+                      <div className="absolute -top-2 -right-2">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          selectedDocuments.includes(doc.id) 
+                            ? 'bg-primary border-primary' 
+                            : 'bg-background border-border'
+                        }`}>
+                          {selectedDocuments.includes(doc.id) && (
+                            <CheckSquare className="w-3 h-3 text-primary-foreground" />
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {!selectionMode && (
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/20 rounded-lg">
+                        <Eye className="w-4 h-4 text-white" />
+                      </div>
+                    )}
                   </div>
                   
                   <div className={viewMode === "list" ? "flex-1" : ""}>
@@ -690,6 +781,23 @@ const Documents = () => {
           </div>
         )}
       </div>
+
+      {/* Document Preview */}
+      <DocumentPreview
+        documentId={previewDocumentId}
+        isOpen={showPreview}
+        onClose={() => {
+          setShowPreview(false);
+          setPreviewDocumentId(null);
+        }}
+      />
+
+      {/* Bulk Operations Panel */}
+      <BulkOperationsPanel
+        selectedDocuments={selectedDocuments}
+        onSelectionClear={clearSelection}
+        onOperationComplete={handleOperationComplete}
+      />
 
       {/* Rename Folder Dialog */}
       <Dialog open={showRenameDialog} onOpenChange={setShowRenameDialog}>

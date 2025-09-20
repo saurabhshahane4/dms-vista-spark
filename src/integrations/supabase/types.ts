@@ -14,6 +14,100 @@ export type Database = {
   }
   public: {
     Tables: {
+      document_shares: {
+        Row: {
+          created_at: string
+          document_id: string
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          permission_level: string
+          share_token: string
+          shared_by: string
+          shared_with_email: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          permission_level: string
+          share_token: string
+          shared_by: string
+          shared_with_email: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          permission_level?: string
+          share_token?: string
+          shared_by?: string
+          shared_with_email?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_shares_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_versions: {
+        Row: {
+          comment: string | null
+          created_at: string
+          document_id: string
+          file_path: string
+          file_size: number | null
+          id: string
+          is_current: boolean | null
+          mime_type: string | null
+          user_id: string
+          version_number: number
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          document_id: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          is_current?: boolean | null
+          mime_type?: string | null
+          user_id: string
+          version_number?: number
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          document_id?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          is_current?: boolean | null
+          mime_type?: string | null
+          user_id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           category: string | null
@@ -26,6 +120,7 @@ export type Database = {
           is_physical: boolean | null
           mime_type: string | null
           name: string
+          physical_location_id: string | null
           status: string | null
           tags: string[] | null
           updated_at: string
@@ -42,6 +137,7 @@ export type Database = {
           is_physical?: boolean | null
           mime_type?: string | null
           name: string
+          physical_location_id?: string | null
           status?: string | null
           tags?: string[] | null
           updated_at?: string
@@ -58,12 +154,21 @@ export type Database = {
           is_physical?: boolean | null
           mime_type?: string | null
           name?: string
+          physical_location_id?: string | null
           status?: string | null
           tags?: string[] | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "documents_physical_location_id_fkey"
+            columns: ["physical_location_id"]
+            isOneToOne: false
+            referencedRelation: "storage_locations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       folders: {
         Row: {
@@ -136,12 +241,113 @@ export type Database = {
         }
         Relationships: []
       }
+      storage_analytics: {
+        Row: {
+          created_at: string
+          files_by_type: Json | null
+          growth_rate_30d: number | null
+          id: string
+          last_calculated: string | null
+          size_by_category: Json | null
+          storage_efficiency: number | null
+          total_files: number | null
+          total_size_bytes: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          files_by_type?: Json | null
+          growth_rate_30d?: number | null
+          id?: string
+          last_calculated?: string | null
+          size_by_category?: Json | null
+          storage_efficiency?: number | null
+          total_files?: number | null
+          total_size_bytes?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          files_by_type?: Json | null
+          growth_rate_30d?: number | null
+          id?: string
+          last_calculated?: string | null
+          size_by_category?: Json | null
+          storage_efficiency?: number | null
+          total_files?: number | null
+          total_size_bytes?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      storage_locations: {
+        Row: {
+          address: string | null
+          capacity: number | null
+          code: string
+          created_at: string
+          current_usage: number | null
+          floor_level: string | null
+          id: string
+          location_type: string
+          name: string
+          notes: string | null
+          section: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          capacity?: number | null
+          code: string
+          created_at?: string
+          current_usage?: number | null
+          floor_level?: string | null
+          id?: string
+          location_type: string
+          name: string
+          notes?: string | null
+          section?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          capacity?: number | null
+          code?: string
+          created_at?: string
+          current_usage?: number | null
+          floor_level?: string | null
+          id?: string
+          location_type?: string
+          name?: string
+          notes?: string | null
+          section?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_share_token: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_document_with_version: {
+        Args: { doc_id: string }
+        Returns: {
+          current_version: number
+          file_path: string
+          id: string
+          name: string
+          total_versions: number
+          version_comment: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
