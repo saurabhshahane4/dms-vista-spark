@@ -1,9 +1,17 @@
-import { Search, Globe, Moon, User } from "lucide-react";
+import { Globe, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import AISearchInput from "./AISearchInput";
+import UserAvatarDropdown from "./UserAvatarDropdown";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 const Header = () => {
-  return <header className="border-b border-border px-6 py-4 bg-gray-50">
+  const { theme, toggleTheme } = useTheme();
+  const { language, toggleLanguage, t } = useLanguage();
+  const { user } = useAuth();
+
+  return (
+    <header className="border-b border-border px-6 py-4 bg-background">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-dms-purple to-dms-blue rounded-lg">
@@ -20,25 +28,41 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="AI Search" className="pl-10 w-64 bg-background border-border" />
-          </div>
+          <AISearchInput />
           
-          <Button variant="ghost" size="sm" className="text-muted-foreground">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-muted-foreground hover:text-foreground"
+            onClick={toggleLanguage}
+          >
             <Globe className="w-4 h-4 mr-2" />
-            العربية
+            {t('language')}
           </Button>
           
-          <Button variant="ghost" size="sm">
-            <Moon className="w-4 h-4" />
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={toggleTheme}
+            className="hover:bg-accent"
+          >
+            {theme === 'light' ? (
+              <Moon className="w-4 h-4" />
+            ) : (
+              <Sun className="w-4 h-4" />
+            )}
           </Button>
           
-          <Avatar className="w-8 h-8 bg-dms-blue">
-            <AvatarFallback className="text-white text-sm font-semibold">SS</AvatarFallback>
-          </Avatar>
+          {user ? (
+            <UserAvatarDropdown />
+          ) : (
+            <Button variant="outline" size="sm">
+              Sign In
+            </Button>
+          )}
         </div>
       </div>
-    </header>;
+    </header>
+  );
 };
 export default Header;
