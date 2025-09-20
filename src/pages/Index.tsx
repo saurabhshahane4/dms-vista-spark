@@ -7,6 +7,7 @@ import QuickActions from "@/components/dms/QuickActions";
 import Documents from "@/pages/Documents";
 import PhysicalTracking from "@/pages/PhysicalTracking";
 import Workflow from "@/pages/Workflow";
+import Analytics from "@/pages/Analytics";
 import { FileText, Archive, Clock, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDocuments } from "@/hooks/useDocuments";
@@ -100,13 +101,7 @@ const Index = () => {
 
         {activeTab === 'Workflow' && <Workflow />}
 
-        {activeTab === 'Analytics' && (
-          <div className="text-center py-12">
-            <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-foreground mb-2">Analytics & Reports</h3>
-            <p className="text-muted-foreground">View detailed analytics and generate reports on document usage.</p>
-          </div>
-        )}
+        {activeTab === 'Analytics' && <Analytics />}
       </main>
     </div>
   );
