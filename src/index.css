@@ -34,19 +34,19 @@
     --input: 220 13% 91%;
     --ring: 217 91% 60%;
 
-    /* DMS Semantic Colors */
-    --dms-blue: 217 91% 60%;
-    --dms-purple: 270 91% 65%;
-    --dms-green: 142 71% 45%;
-    --dms-orange: 25 95% 53%;
-    --dms-success: 142 71% 45%;
-    --dms-warning: 45 93% 47%;
-    --dms-info: 217 91% 60%;
+    /* DMS Enterprise Colors - Professional & Muted */
+    --dms-blue: 217 32% 45%;
+    --dms-purple: 258 25% 42%;
+    --dms-green: 142 35% 35%;
+    --dms-orange: 25 45% 45%;
+    --dms-success: 142 35% 35%;
+    --dms-warning: 45 55% 42%;
+    --dms-info: 217 32% 45%;
     
-    /* Status Colors */
-    --status-approved: 142 71% 45%;
-    --status-pending: 45 93% 47%;
-    --status-processing: 217 91% 60%;
+    /* Status Colors - Enterprise Tones */
+    --status-approved: 142 35% 35%;
+    --status-pending: 45 55% 42%;
+    --status-processing: 217 32% 45%;
     
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(270 91% 65%));
