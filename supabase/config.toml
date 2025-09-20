@@ -1,1 +1,10 @@
 project_id = "ysmwlknwwbdmghlxwumb"
+
+[functions.ai-search]
+verify_jwt = true
+
+[functions.ai-document-processor]  
+verify_jwt = true
+
+[functions.folder-operations]
+verify_jwt = true

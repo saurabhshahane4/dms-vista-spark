@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
-import { Search, Grid3X3, List, FolderOpen, Building2, MapPin, ArrowLeft, FileText, DollarSign, Scale, Users, Megaphone, BarChart3, Image, Headphones, Video, Archive, Folder, Sheet } from "lucide-react";
+import { Search, Grid3X3, List, FolderOpen, Building2, MapPin, ArrowLeft, FileText, DollarSign, Scale, Users, Megaphone, BarChart3, Image, Headphones, Video, Archive, Folder, Sheet, Plus, MoreVertical, Edit, Trash2, Copy, FolderPlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Label } from "@/components/ui/label";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useDocuments } from "@/hooks/useDocuments";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Map icon names to actual icon components
 const iconComponents = {
@@ -23,7 +30,13 @@ const iconComponents = {
   Archive,
   Folder,
   Building2,
-  MapPin
+  MapPin,
+  Plus,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Copy,
+  FolderPlus
 };
 
 interface DocumentData {
@@ -34,12 +47,54 @@ interface DocumentData {
   size: string;
 }
 
+const folderCategories = [
+  'Financial Records',
+  'Legal Documents', 
+  'HR Documents',
+  'Projects',
+  'Marketing',
+  'Reports',
+  'Images',
+  'PDF Documents',
+  'Spreadsheets',
+  'Documents',
+  'Audio Files',
+  'Video Files',
+  'General'
+];
+
+const departments = [
+  'Human Resources',
+  'Finance',
+  'Legal',
+  'Marketing', 
+  'Operations',
+  'IT',
+  'Sales',
+  'Administration'
+];
+
 const Documents = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [filterType, setFilterType] = useState("all");
   const [currentFolder, setCurrentFolder] = useState<number | null>(null);
-  const { folders, loading } = useDocuments();
+  
+  // Folder management states
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showRenameDialog, setShowRenameDialog] = useState(false);
+  const [showCopyDialog, setShowCopyDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedFolderIndex, setSelectedFolderIndex] = useState<number | null>(null);
+  const [newFolderName, setNewFolderName] = useState("");
+  const [newFolderCategory, setNewFolderCategory] = useState("");
+  const [newFolderDepartment, setNewFolderDepartment] = useState("");
+  const [copyTargetName, setCopyTargetName] = useState("");
+  const [operationLoading, setOperationLoading] = useState(false);
+  
+  const { folders, loading, refetch } = useDocuments();
+  const { toast } = useToast();
+  const { user } = useAuth();
 
   // Load view preference from localStorage
   useEffect(() => {
@@ -53,6 +108,213 @@ const Documents = () => {
   const handleViewModeChange = (mode: "grid" | "list") => {
     setViewMode(mode);
     localStorage.setItem('documents-view-mode', mode);
+  };
+
+  // Folder Management Functions
+  const handleAddFolder = async () => {
+    if (!newFolderName.trim() || !newFolderCategory || !newFolderDepartment || !user) {
+      toast({
+        title: 'Error',
+        description: 'Please fill in all fields',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setOperationLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('folder-operations', {
+        body: { 
+          operation: 'create',
+          folderName: newFolderName,
+          category: newFolderCategory,
+          department: newFolderDepartment
+        },
+        headers: {
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: data.message || `Folder "${newFolderName}" created successfully`,
+      });
+
+      // Reset form and close dialog
+      setNewFolderName("");
+      setNewFolderCategory("");
+      setNewFolderDepartment("");
+      setShowAddDialog(false);
+      refetch();
+    } catch (error) {
+      console.error('Error creating folder:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create folder',
+        variant: 'destructive'
+      });
+    } finally {
+      setOperationLoading(false);
+    }
+  };
+
+  const handleRenameFolder = async () => {
+    if (!newFolderName.trim() || selectedFolderIndex === null || !user) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a valid folder name',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setOperationLoading(true);
+    try {
+      const folderToRename = folders[selectedFolderIndex];
+      
+      const { data, error } = await supabase.functions.invoke('folder-operations', {
+        body: { 
+          operation: 'rename',
+          folderName: folderToRename.name,
+          newFolderName: newFolderName
+        },
+        headers: {
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: data.message || `Folder renamed to "${newFolderName}"`,
+      });
+
+      // Reset form and close dialog
+      setNewFolderName("");
+      setShowRenameDialog(false);
+      setSelectedFolderIndex(null);
+      refetch();
+    } catch (error) {
+      console.error('Error renaming folder:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to rename folder',
+        variant: 'destructive'
+      });
+    } finally {
+      setOperationLoading(false);
+    }
+  };
+
+  const handleCopyFolder = async () => {
+    if (!copyTargetName.trim() || selectedFolderIndex === null || !user) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a valid folder name',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setOperationLoading(true);
+    try {
+      const folderToCopy = folders[selectedFolderIndex];
+      
+      const { data, error } = await supabase.functions.invoke('folder-operations', {
+        body: { 
+          operation: 'copy',
+          folderName: folderToCopy.name,
+          newFolderName: copyTargetName
+        },
+        headers: {
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: data.message || `Folder copied as "${copyTargetName}"`,
+      });
+
+      // Reset form and close dialog
+      setCopyTargetName("");
+      setShowCopyDialog(false);
+      setSelectedFolderIndex(null);
+      refetch();
+    } catch (error) {
+      console.error('Error copying folder:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to copy folder',
+        variant: 'destructive'
+      });
+    } finally {
+      setOperationLoading(false);
+    }
+  };
+
+  const handleDeleteFolder = async () => {
+    if (selectedFolderIndex === null || !user) return;
+
+    setOperationLoading(true);
+    try {
+      const folderToDelete = folders[selectedFolderIndex];
+      
+      const { data, error } = await supabase.functions.invoke('folder-operations', {
+        body: { 
+          operation: 'delete',
+          folderName: folderToDelete.name
+        },
+        headers: {
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: data.message || `Folder "${folderToDelete.name}" deleted`,
+      });
+
+      // Close dialog and refresh
+      setShowDeleteDialog(false);
+      setSelectedFolderIndex(null);
+      refetch();
+    } catch (error) {
+      console.error('Error deleting folder:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete folder',
+        variant: 'destructive'
+      });
+    } finally {
+      setOperationLoading(false);
+    }
+  };
+
+  const openFolderMenu = (folderIndex: number, action: 'rename' | 'copy' | 'delete') => {
+    setSelectedFolderIndex(folderIndex);
+    const folder = folders[folderIndex];
+    
+    switch (action) {
+      case 'rename':
+        setNewFolderName(folder.name);
+        setShowRenameDialog(true);
+        break;
+      case 'copy':
+        setCopyTargetName(`Copy of ${folder.name}`);
+        setShowCopyDialog(true);
+        break;
+      case 'delete':
+        setShowDeleteDialog(true);
+        break;
+    }
   };
 
   const getCurrentFolders = () => {
@@ -208,6 +470,76 @@ const Documents = () => {
             <>
               <FolderOpen className="w-5 h-5 text-muted-foreground" />
               <h3 className="text-lg font-medium text-foreground">Folders ({displayFolders.length})</h3>
+              <div className="ml-auto">
+                <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" className="gap-2">
+                      <FolderPlus className="w-4 h-4" />
+                      Add Folder
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create New Folder</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="folderName">Folder Name</Label>
+                        <Input
+                          id="folderName"
+                          value={newFolderName}
+                          onChange={(e) => setNewFolderName(e.target.value)}
+                          placeholder="Enter folder name"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="category">Category</Label>
+                        <Select value={newFolderCategory} onValueChange={setNewFolderCategory}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {folderCategories.map((category) => (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="department">Department</Label>
+                        <Select value={newFolderDepartment} onValueChange={setNewFolderDepartment}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select department" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {departments.map((dept) => (
+                              <SelectItem key={dept} value={dept}>
+                                {dept}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowAddDialog(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleAddFolder}
+                          disabled={operationLoading}
+                        >
+                          {operationLoading ? 'Creating...' : 'Create Folder'}
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </>
           )}
         </div>
@@ -250,36 +582,83 @@ const Documents = () => {
               return (
                 <Card 
                   key={folder.name} 
-                  className="p-4 hover:shadow-md transition-shadow cursor-pointer border border-border/50"
-                  onClick={() => handleFolderClick(index)}
+                  className="p-4 hover:shadow-md transition-shadow border border-border/50 group"
                 >
                   <div className={viewMode === "grid" ? "space-y-3" : "flex items-center gap-4"}>
-                    <div className={`w-12 h-12 ${folder.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                    <div 
+                      className={`w-12 h-12 ${folder.iconBg} rounded-lg flex items-center justify-center flex-shrink-0 cursor-pointer`}
+                      onClick={() => handleFolderClick(index)}
+                    >
                       <IconComponent className="w-6 h-6 text-white" />
                     </div>
                     
-                    <div className={viewMode === "list" ? "flex-1" : ""}>
-                      <h4 className="font-medium text-foreground mb-1">{folder.name}</h4>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {folder.documentCount.toLocaleString()} document{folder.documentCount !== 1 ? 's' : ''}
-                      </p>
-                      <p className="text-xs text-muted-foreground mb-3">
-                        Modified: {folder.modified}
-                      </p>
-                      
-                      {folder.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {folder.tags.map((tag, tagIndex) => (
-                            <Badge 
-                              key={tagIndex} 
-                              variant="secondary" 
-                              className="text-xs"
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
+                    <div className={`${viewMode === "list" ? "flex-1" : ""} cursor-pointer`} onClick={() => handleFolderClick(index)}>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-foreground mb-1">{folder.name}</h4>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {folder.documentCount.toLocaleString()} document{folder.documentCount !== 1 ? 's' : ''}
+                          </p>
+                          <p className="text-xs text-muted-foreground mb-3">
+                            Modified: {folder.modified}
+                          </p>
+                          
+                          {folder.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {folder.tags.map((tag, tagIndex) => (
+                                <Badge 
+                                  key={tagIndex} 
+                                  variant="secondary" 
+                                  className="text-xs"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                      )}
+                        
+                        {/* Folder Actions Menu */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={(e) => {
+                              e.stopPropagation();
+                              openFolderMenu(index, 'rename');
+                            }}>
+                              <Edit className="w-4 h-4 mr-2" />
+                              Rename
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => {
+                              e.stopPropagation();
+                              openFolderMenu(index, 'copy');
+                            }}>
+                              <Copy className="w-4 h-4 mr-2" />
+                              Copy
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openFolderMenu(index, 'delete');
+                              }}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
                   </div>
                 </Card>
@@ -309,6 +688,96 @@ const Documents = () => {
           </div>
         )}
       </div>
+
+      {/* Rename Folder Dialog */}
+      <Dialog open={showRenameDialog} onOpenChange={setShowRenameDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rename Folder</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="renameFolderName">New Folder Name</Label>
+              <Input
+                id="renameFolderName"
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                placeholder="Enter new folder name"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowRenameDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleRenameFolder}
+                disabled={operationLoading}
+              >
+                {operationLoading ? 'Renaming...' : 'Rename'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Copy Folder Dialog */}
+      <Dialog open={showCopyDialog} onOpenChange={setShowCopyDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Copy Folder</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="copyFolderName">New Folder Name</Label>
+              <Input
+                id="copyFolderName"
+                value={copyTargetName}
+                onChange={(e) => setCopyTargetName(e.target.value)}
+                placeholder="Enter name for copied folder"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowCopyDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCopyFolder}
+                disabled={operationLoading}
+              >
+                {operationLoading ? 'Copying...' : 'Copy Folder'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Folder Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Folder</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this folder? All documents will be moved to the General folder. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteFolder}
+              disabled={operationLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {operationLoading ? 'Deleting...' : 'Delete Folder'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
