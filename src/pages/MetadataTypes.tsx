@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { useMetadataTypes, MetadataType } from '@/hooks/useMetadataTypes';
 import MetadataTypeForm from '@/components/metadata/MetadataTypeForm';
-import { Database, ArrowLeft, Plus, Edit, Trash2 } from 'lucide-react';
+import { Database, ArrowLeft, Plus, Edit, Trash2, ArrowUpDown, Search, Filter } from 'lucide-react';
 
 const MetadataTypes = () => {
   const { setActiveTab } = useNavigation();
@@ -14,6 +18,57 @@ const MetadataTypes = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingMetadataType, setEditingMetadataType] = useState<MetadataType | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<MetadataType | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [requiredFilter, setRequiredFilter] = useState<string>('all');
+  const [sortField, setSortField] = useState<keyof MetadataType>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  // Filtering and sorting logic
+  const filteredAndSortedData = useMemo(() => {
+    let filtered = metadataTypes.filter(metadata => {
+      const matchesSearch = metadata.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           (metadata.description?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                           (metadata.related_document_type?.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesType = typeFilter === 'all' || metadata.type === typeFilter;
+      const matchesRequired = requiredFilter === 'all' || 
+                            (requiredFilter === 'required' && metadata.required) ||
+                            (requiredFilter === 'optional' && !metadata.required);
+      
+      return matchesSearch && matchesType && matchesRequired;
+    });
+
+    // Sort the filtered data
+    filtered.sort((a, b) => {
+      let aValue = a[sortField];
+      let bValue = b[sortField];
+      
+      // Handle undefined values
+      if (aValue === undefined) aValue = '';
+      if (bValue === undefined) bValue = '';
+      
+      // Convert to string for comparison
+      const aStr = String(aValue).toLowerCase();
+      const bStr = String(bValue).toLowerCase();
+      
+      if (sortDirection === 'asc') {
+        return aStr.localeCompare(bStr);
+      } else {
+        return bStr.localeCompare(aStr);
+      }
+    });
+
+    return filtered;
+  }, [metadataTypes, searchTerm, typeFilter, requiredFilter, sortField, sortDirection]);
+
+  const handleSort = (field: keyof MetadataType) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
   
   const handleBackToSettings = () => {
     setActiveTab('Settings');
@@ -92,73 +147,182 @@ const MetadataTypes = () => {
         </Button>
       </div>
 
+      {/* Filters and Search */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Search metadata types..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <Filter className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="Filter by type" />
+          </SelectTrigger>
+          <SelectContent className="bg-background border shadow-md z-50">
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="text">Text</SelectItem>
+            <SelectItem value="select">Select</SelectItem>
+            <SelectItem value="multi-select">Multi-select</SelectItem>
+            <SelectItem value="date">Date</SelectItem>
+            <SelectItem value="number">Number</SelectItem>
+            <SelectItem value="boolean">Boolean</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={requiredFilter} onValueChange={setRequiredFilter}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Filter by required" />
+          </SelectTrigger>
+          <SelectContent className="bg-background border shadow-md z-50">
+            <SelectItem value="all">All Fields</SelectItem>
+            <SelectItem value="required">Required Only</SelectItem>
+            <SelectItem value="optional">Optional Only</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       {loading ? (
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4">
-          {metadataTypes.map((metadata) => (
-            <Card key={metadata.id} className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3">
-                    <h3 className="font-medium text-foreground">{metadata.name}</h3>
-                    <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground">
-                      {getTypeLabel(metadata.type)}
-                    </span>
-                    {metadata.required && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-destructive/10 text-destructive">
-                        Required
-                      </span>
-                    )}
-                    {metadata.related_document_type && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary">
-                        {metadata.related_document_type}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">{metadata.description}</p>
-                  {metadata.options && metadata.options.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {metadata.options.map((option, idx) => (
-                        <span key={idx} className="inline-flex items-center px-2 py-1 rounded text-xs bg-secondary text-secondary-foreground">
-                          {option}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleEdit(metadata)}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleDelete(metadata)}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
-          {metadataTypes.length === 0 && (
-            <div className="text-center py-8">
+      ) : filteredAndSortedData.length === 0 ? (
+        <div className="text-center py-8">
+          {metadataTypes.length === 0 ? (
+            <>
               <p className="text-muted-foreground">No metadata types configured yet.</p>
               <Button onClick={handleAdd} variant="outline" className="mt-4">
                 <Plus className="h-4 w-4 mr-2" />
                 Create your first metadata type
               </Button>
-            </div>
+            </>
+          ) : (
+            <p className="text-muted-foreground">No metadata types match your current filters.</p>
           )}
+        </div>
+      ) : (
+        <div className="border rounded-md">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[200px]">
+                  <Button
+                    variant="ghost"
+                    className="h-auto p-0 font-medium hover:bg-transparent"
+                    onClick={() => handleSort('name')}
+                  >
+                    Name
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    className="h-auto p-0 font-medium hover:bg-transparent"
+                    onClick={() => handleSort('type')}
+                  >
+                    Type
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    className="h-auto p-0 font-medium hover:bg-transparent"
+                    onClick={() => handleSort('required')}
+                  >
+                    Required
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    className="h-auto p-0 font-medium hover:bg-transparent"
+                    onClick={() => handleSort('related_document_type')}
+                  >
+                    Document Type
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Options</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredAndSortedData.map((metadata) => (
+                <TableRow key={metadata.id}>
+                  <TableCell className="font-medium">{metadata.name}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">
+                      {getTypeLabel(metadata.type)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {metadata.required ? (
+                      <Badge variant="destructive">Required</Badge>
+                    ) : (
+                      <Badge variant="outline">Optional</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {metadata.related_document_type ? (
+                      <Badge variant="default">{metadata.related_document_type}</Badge>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">None</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="max-w-[300px] truncate">
+                    {metadata.description || (
+                      <span className="text-muted-foreground text-sm">No description</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {metadata.options && metadata.options.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {metadata.options.slice(0, 3).map((option, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            {option}
+                          </Badge>
+                        ))}
+                        {metadata.options.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{metadata.options.length - 3} more
+                          </Badge>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">None</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleEdit(metadata)}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleDelete(metadata)}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
 
