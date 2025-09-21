@@ -11,6 +11,7 @@ import Analytics from "@/pages/Analytics";
 import EnhancedUpload from "@/pages/EnhancedUpload";
 import Scan from "@/pages/Scan";
 import Settings from "@/pages/Settings";
+import MetadataTypes from "@/pages/MetadataTypes";
 import { FileText, Archive, Clock, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDocuments } from "@/hooks/useDocuments";
@@ -33,6 +34,10 @@ const Index = () => {
 
   if (activeTab === 'Settings') {
     return <Settings />;
+  }
+
+  if (activeTab === 'MetadataTypes') {
+    return <MetadataTypes />;
   }
 
   // Show loading state while contexts are initializing

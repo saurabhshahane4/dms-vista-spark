@@ -32,25 +32,31 @@ const Settings = () => {
   };
 
   const setupItems = [
-    { title: 'Announcements', icon: Megaphone },
-    { title: 'Assets', icon: Package },
-    { title: 'Document types', icon: FileType },
-    { title: 'Global ACLs', icon: Globe },
-    { title: 'Groups', icon: Users },
-    { title: 'Indexes', icon: List },
-    { title: 'Key management', icon: Key },
-    { title: 'Mailing profiles', icon: Mail },
-    { title: 'Metadata types', icon: Database },
-    { title: 'Quotas', icon: Timer },
-    { title: 'Roles', icon: ShieldCheck },
-    { title: 'Settings', icon: SettingsIcon },
-    { title: 'Smart links', icon: Link },
-    { title: 'Sources', icon: Download },
-    { title: 'Themes', icon: Palette },
-    { title: 'Users', icon: User },
-    { title: 'Web links', icon: ExternalLink },
-    { title: 'Workflows', icon: Workflow },
+    { title: 'Announcements', icon: Megaphone, action: null },
+    { title: 'Assets', icon: Package, action: null },
+    { title: 'Document types', icon: FileType, action: null },
+    { title: 'Global ACLs', icon: Globe, action: null },
+    { title: 'Groups', icon: Users, action: null },
+    { title: 'Indexes', icon: List, action: null },
+    { title: 'Key management', icon: Key, action: null },
+    { title: 'Mailing profiles', icon: Mail, action: null },
+    { title: 'Metadata types', icon: Database, action: 'MetadataTypes' },
+    { title: 'Quotas', icon: Timer, action: null },
+    { title: 'Roles', icon: ShieldCheck, action: null },
+    { title: 'Settings', icon: SettingsIcon, action: null },
+    { title: 'Smart links', icon: Link, action: null },
+    { title: 'Sources', icon: Download, action: null },
+    { title: 'Themes', icon: Palette, action: null },
+    { title: 'Users', icon: User, action: null },
+    { title: 'Web links', icon: ExternalLink, action: null },
+    { title: 'Workflows', icon: Workflow, action: null },
   ];
+
+  const handleCardClick = (action: string | null) => {
+    if (action) {
+      setActiveTab(action as any);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -80,6 +86,7 @@ const Settings = () => {
             <Card 
               key={index}
               className="p-8 hover:shadow-lg transition-all duration-200 cursor-pointer group bg-slate-700/90 hover:bg-slate-700 border-slate-600"
+              onClick={() => handleCardClick(item.action)}
             >
               <div className="flex flex-col items-center text-center space-y-4">
                 <div className="p-4 rounded-lg bg-slate-600/50 group-hover:bg-slate-600/70 transition-colors">
