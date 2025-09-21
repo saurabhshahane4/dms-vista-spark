@@ -112,8 +112,8 @@ const AuthPage = () => {
                   <SelectValue placeholder="Select your location" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="warehouse-1">Warehouse 1</SelectItem>
-                  <SelectItem value="warehouse-2">Warehouse 2</SelectItem>
+                  <SelectItem value="warehouse-1">Jumeirah</SelectItem>
+                  <SelectItem value="warehouse-2">Jabel Ali</SelectItem>
                 </SelectContent>
               </Select>
             </div>
