@@ -9,10 +9,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigation } from '@/contexts/NavigationContext';
 import { Button } from '@/components/ui/button';
 
 const UserAvatarDropdown = () => {
   const { user, profile, signOut } = useAuth();
+  const { setActiveTab } = useNavigation();
 
   if (!user) return null;
 
@@ -58,7 +60,7 @@ const UserAvatarDropdown = () => {
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setActiveTab('Settings')}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>
