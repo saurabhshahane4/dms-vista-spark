@@ -70,7 +70,7 @@ const EnhancedUpload = () => {
   const [documentTitle, setDocumentTitle] = useState("");
   const [category, setCategory] = useState("");
   const [department, setDepartment] = useState("");
-  const [tags, setTags] = useState("");
+  const [zone, setZone] = useState("");
   const [description, setDescription] = useState("");
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -170,7 +170,7 @@ const EnhancedUpload = () => {
       }
 
       // Create document record with AI analysis and folder organization
-      const tagsArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+      const tagsArray = zone ? [zone] : [];
       
       const { error: dbError } = await supabase
         .from('documents')
@@ -401,13 +401,19 @@ const EnhancedUpload = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tags">Tags</Label>
-              <Input
-                id="tags"
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
-                placeholder="Enter tags (comma separated)"
-              />
+              <Label htmlFor="zone">Zone</Label>
+              <Select value={zone} onValueChange={setZone}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select zone" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5, 6].map((zoneNum) => (
+                    <SelectItem key={zoneNum} value={zoneNum.toString()}>
+                      {zoneNum}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
