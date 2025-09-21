@@ -220,6 +220,42 @@ export type Database = {
           },
         ]
       }
+      metadata_types: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          options: Json | null
+          required: boolean
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          options?: Json | null
+          required?: boolean
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          options?: Json | null
+          required?: boolean
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
