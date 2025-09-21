@@ -10,6 +10,7 @@ export interface MetadataType {
   required: boolean;
   description?: string;
   options?: string[];
+  related_document_type?: string;
   created_at: string;
   updated_at: string;
 }
@@ -40,6 +41,7 @@ export const useMetadataTypes = () => {
         options: Array.isArray(item.options) 
           ? item.options.filter(opt => typeof opt === 'string') as string[]
           : [],
+        related_document_type: item.related_document_type || undefined,
         created_at: item.created_at,
         updated_at: item.updated_at
       }));
@@ -80,6 +82,7 @@ export const useMetadataTypes = () => {
         options: Array.isArray(data.options) 
           ? data.options.filter(opt => typeof opt === 'string') as string[]
           : [],
+        related_document_type: data.related_document_type || undefined,
         created_at: data.created_at,
         updated_at: data.updated_at
       };
@@ -116,6 +119,7 @@ export const useMetadataTypes = () => {
         options: Array.isArray(data.options) 
           ? data.options.filter(opt => typeof opt === 'string') as string[]
           : [],
+        related_document_type: data.related_document_type || undefined,
         created_at: data.created_at,
         updated_at: data.updated_at
       };

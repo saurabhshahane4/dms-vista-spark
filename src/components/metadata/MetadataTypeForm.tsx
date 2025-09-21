@@ -26,7 +26,8 @@ const MetadataTypeForm: React.FC<MetadataTypeFormProps> = ({
     type: 'text' as MetadataType['type'],
     required: false,
     description: '',
-    options: [] as string[]
+    options: [] as string[],
+    related_document_type: ''
   });
   const [newOption, setNewOption] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,7 +39,8 @@ const MetadataTypeForm: React.FC<MetadataTypeFormProps> = ({
         type: metadataType.type,
         required: metadataType.required,
         description: metadataType.description || '',
-        options: metadataType.options || []
+        options: metadataType.options || [],
+        related_document_type: metadataType.related_document_type || ''
       });
     }
   }, [metadataType]);
@@ -56,7 +58,8 @@ const MetadataTypeForm: React.FC<MetadataTypeFormProps> = ({
           type: 'text',
           required: false,
           description: '',
-          options: []
+          options: [],
+          related_document_type: ''
         });
         setNewOption('');
       }
@@ -134,6 +137,16 @@ const MetadataTypeForm: React.FC<MetadataTypeFormProps> = ({
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Brief description of this metadata field"
               rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="related_document_type">Related Document Type</Label>
+            <Input
+              id="related_document_type"
+              value={formData.related_document_type}
+              onChange={(e) => setFormData(prev => ({ ...prev, related_document_type: e.target.value }))}
+              placeholder="e.g., Contract, Invoice, Report"
             />
           </div>
 

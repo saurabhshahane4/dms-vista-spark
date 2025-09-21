@@ -227,6 +227,7 @@ export type Database = {
           id: string
           name: string
           options: Json | null
+          related_document_type: string | null
           required: boolean
           type: string
           updated_at: string
@@ -238,6 +239,7 @@ export type Database = {
           id?: string
           name: string
           options?: Json | null
+          related_document_type?: string | null
           required?: boolean
           type: string
           updated_at?: string
@@ -249,6 +251,7 @@ export type Database = {
           id?: string
           name?: string
           options?: Json | null
+          related_document_type?: string | null
           required?: boolean
           type?: string
           updated_at?: string

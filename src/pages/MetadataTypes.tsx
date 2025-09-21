@@ -114,6 +114,11 @@ const MetadataTypes = () => {
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">{metadata.description}</p>
+                  {metadata.related_document_type && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      <span className="font-medium">Document Type:</span> {metadata.related_document_type}
+                    </p>
+                  )}
                   {metadata.options && metadata.options.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
                       {metadata.options.map((option, idx) => (
