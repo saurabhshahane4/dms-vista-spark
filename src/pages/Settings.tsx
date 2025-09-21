@@ -1,5 +1,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useNavigation } from '@/contexts/NavigationContext';
 import { 
   Settings as SettingsIcon, 
   Megaphone, 
@@ -18,10 +20,17 @@ import {
   Palette, 
   User, 
   ExternalLink, 
-  Workflow 
+  Workflow,
+  ArrowLeft 
 } from 'lucide-react';
 
 const Settings = () => {
+  const { setActiveTab } = useNavigation();
+  
+  const handleBackToDashboard = () => {
+    setActiveTab('Dashboard');
+  };
+
   const setupItems = [
     { title: 'Announcements', icon: Megaphone },
     { title: 'Assets', icon: Package },
@@ -45,6 +54,15 @@ const Settings = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
+      <Button 
+        variant="ghost" 
+        onClick={handleBackToDashboard}
+        className="mb-6 flex items-center gap-2 hover:bg-muted"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Dashboard
+      </Button>
+      
       <div className="flex items-center gap-3 mb-8">
         <div className="p-2 bg-muted rounded-lg">
           <SettingsIcon className="h-6 w-6 text-muted-foreground" />
