@@ -112,13 +112,13 @@ const MetadataTypes = () => {
                         Required
                       </span>
                     )}
+                    {metadata.related_document_type && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary">
+                        {metadata.related_document_type}
+                      </span>
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">{metadata.description}</p>
-                  {metadata.related_document_type && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      <span className="font-medium">Document Type:</span> {metadata.related_document_type}
-                    </p>
-                  )}
                   {metadata.options && metadata.options.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
                       {metadata.options.map((option, idx) => (
