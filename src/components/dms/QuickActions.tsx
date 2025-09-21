@@ -11,7 +11,7 @@ const QuickActions = () => {
   const { setActiveTab } = useNavigation();
 
   const handleScan = () => {
-    setActiveTab('Physical Tracking');
+    setActiveTab('Scan');
   };
 
   const handleReports = () => {

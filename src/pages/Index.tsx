@@ -9,6 +9,7 @@ import PhysicalTracking from "@/pages/PhysicalTracking";
 import Workflow from "@/pages/Workflow";
 import Analytics from "@/pages/Analytics";
 import EnhancedUpload from "@/pages/EnhancedUpload";
+import Scan from "@/pages/Scan";
 import { FileText, Archive, Clock, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDocuments } from "@/hooks/useDocuments";
@@ -22,6 +23,11 @@ const Index = () => {
   // Check if we should show the enhanced upload page
   if (activeTab === 'EnhancedUpload') {
     return <EnhancedUpload />;
+  }
+
+  // Check if we should show the scan page
+  if (activeTab === 'Scan') {
+    return <Scan />;
   }
 
   // Show loading state while contexts are initializing
