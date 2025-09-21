@@ -58,14 +58,9 @@ const categories = [
 ];
 
 const departments = [
-  "Human Resources",
-  "Finance",
-  "Legal", 
-  "Marketing",
-  "Operations",
-  "IT",
-  "Sales",
-  "Administration"
+  "Cabinets and Lockers",
+  "Racks and Shelving",
+  "Specialized System"
 ];
 
 const EnhancedUpload = () => {
@@ -390,10 +385,10 @@ const EnhancedUpload = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="department">Department</Label>
+              <Label htmlFor="department">Filling Type</Label>
               <Select value={department} onValueChange={setDepartment}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select department" />
+                  <SelectValue placeholder="Select filling type" />
                 </SelectTrigger>
                 <SelectContent>
                   {departments.map((dept) => (
