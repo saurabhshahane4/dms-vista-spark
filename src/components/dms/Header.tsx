@@ -1,7 +1,8 @@
-import { Globe, Moon, Sun } from "lucide-react";
+import { Globe, Moon, Sun, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AISearchInput from "./AISearchInput";
 import UserAvatarDropdown from "./UserAvatarDropdown";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -76,6 +77,8 @@ const Header = () => {
               <Sun className="w-4 h-4" />
             )}
           </Button>
+          
+          {user && <NotificationCenter />}
           
           {user ? (
             <UserAvatarDropdown />

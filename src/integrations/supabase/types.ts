@@ -390,6 +390,44 @@ export type Database = {
           },
         ]
       }
+      document_workflow_triggers: {
+        Row: {
+          conditions: Json | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          trigger_event: string
+          user_id: string
+          workflow_id: string
+        }
+        Insert: {
+          conditions?: Json | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          trigger_event: string
+          user_id: string
+          workflow_id: string
+        }
+        Update: {
+          conditions?: Json | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          trigger_event?: string
+          user_id?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_workflow_triggers_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           category: string | null
@@ -588,6 +626,45 @@ export type Database = {
           required?: boolean
           type?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          metadata: Json | null
+          read_at: string | null
+          title: string
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          metadata?: Json | null
+          read_at?: string | null
+          title: string
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          metadata?: Json | null
+          read_at?: string | null
+          title?: string
+          type?: string | null
           user_id?: string
         }
         Relationships: []
@@ -860,6 +937,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       warehouses: {
         Row: {
           address: string | null
@@ -1081,6 +1179,10 @@ export type Database = {
           version_comment: string
         }[]
       }
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
       halfvec_avg: {
         Args: { "": number[] }
         Returns: unknown
@@ -1096,6 +1198,13 @@ export type Database = {
       halfvec_typmod_in: {
         Args: { "": unknown[] }
         Returns: number
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
       hnsw_bit_support: {
         Args: { "": unknown }
@@ -1151,6 +1260,10 @@ export type Database = {
         Args: { "": string } | { "": unknown } | { "": unknown }
         Returns: unknown
       }
+      mark_notification_read: {
+        Args: { notification_id: string }
+        Returns: undefined
+      }
       search_documents_by_similarity: {
         Args: {
           max_results?: number
@@ -1168,6 +1281,16 @@ export type Database = {
           status: string
           tags: string[]
         }[]
+      }
+      send_notification: {
+        Args: {
+          notification_message: string
+          notification_metadata?: Json
+          notification_title: string
+          notification_type?: string
+          recipient_user_id: string
+        }
+        Returns: string
       }
       sparsevec_out: {
         Args: { "": unknown }
@@ -1207,7 +1330,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "manager" | "user" | "viewer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1334,6 +1457,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "manager", "user", "viewer"],
+    },
   },
 } as const

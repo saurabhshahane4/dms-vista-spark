@@ -13,6 +13,7 @@ import Scan from "@/pages/Scan";
 import Settings from "@/pages/Settings";
 import MetadataTypes from "@/pages/MetadataTypes";
 import WarehouseModule from "@/components/warehouse/WarehouseModule";
+import { UserRoleManager } from "@/components/admin/UserRoleManager";
 import { FileText, Archive, Clock, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDocuments } from "@/hooks/useDocuments";
@@ -39,6 +40,17 @@ const Index = () => {
 
   if (activeTab === 'MetadataTypes') {
     return <MetadataTypes />;
+  }
+
+  if (activeTab === 'UserManagement') {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="px-6 py-8">
+          <UserRoleManager />
+        </main>
+      </div>
+    );
   }
 
   // Show loading state while contexts are initializing
