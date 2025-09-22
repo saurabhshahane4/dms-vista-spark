@@ -12,6 +12,7 @@ import EnhancedUpload from "@/pages/EnhancedUpload";
 import Scan from "@/pages/Scan";
 import Settings from "@/pages/Settings";
 import MetadataTypes from "@/pages/MetadataTypes";
+import WarehouseModule from "@/components/warehouse/WarehouseModule";
 import { FileText, Archive, Clock, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDocuments } from "@/hooks/useDocuments";
@@ -120,6 +121,8 @@ const Index = () => {
         {activeTab === 'Documents' && <Documents />}
 
         {activeTab === 'Physical Tracking' && <PhysicalTracking />}
+
+        {activeTab === 'Warehouse' && <WarehouseModule />}
 
         {activeTab === 'Workflow' && <Workflow />}
 

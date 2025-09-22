@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { NavigationProvider } from "@/contexts/NavigationContext";
+import { WarehouseProvider } from "@/contexts/WarehouseContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -21,7 +22,8 @@ const App = () => (
           <LanguageProvider>
             <AuthProvider>
               <NavigationProvider>
-                <TooltipProvider>
+                <WarehouseProvider>
+                  <TooltipProvider>
                 <Toaster />
                 <Sonner />
                 <Routes>
@@ -29,7 +31,8 @@ const App = () => (
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-                </TooltipProvider>
+                  </TooltipProvider>
+                </WarehouseProvider>
               </NavigationProvider>
             </AuthProvider>
           </LanguageProvider>

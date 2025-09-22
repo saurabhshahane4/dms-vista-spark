@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      document_locations: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          document_id: string
+          id: string
+          notes: string | null
+          rack_id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          document_id: string
+          id?: string
+          notes?: string | null
+          rack_id: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          document_id?: string
+          id?: string
+          notes?: string | null
+          rack_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_locations_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_locations_rack_id_fkey"
+            columns: ["rack_id"]
+            isOneToOne: false
+            referencedRelation: "racks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_shares: {
         Row: {
           created_at: string
@@ -220,6 +265,57 @@ export type Database = {
           },
         ]
       }
+      location_history: {
+        Row: {
+          document_id: string
+          from_rack_id: string | null
+          id: string
+          moved_at: string | null
+          moved_by: string | null
+          notes: string | null
+          reason: string | null
+          to_rack_id: string | null
+          user_id: string
+        }
+        Insert: {
+          document_id: string
+          from_rack_id?: string | null
+          id?: string
+          moved_at?: string | null
+          moved_by?: string | null
+          notes?: string | null
+          reason?: string | null
+          to_rack_id?: string | null
+          user_id: string
+        }
+        Update: {
+          document_id?: string
+          from_rack_id?: string | null
+          id?: string
+          moved_at?: string | null
+          moved_by?: string | null
+          notes?: string | null
+          reason?: string | null
+          to_rack_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_history_from_rack_id_fkey"
+            columns: ["from_rack_id"]
+            isOneToOne: false
+            referencedRelation: "racks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "location_history_to_rack_id_fkey"
+            columns: ["to_rack_id"]
+            isOneToOne: false
+            referencedRelation: "racks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       metadata_types: {
         Row: {
           created_at: string
@@ -291,6 +387,118 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      racks: {
+        Row: {
+          barcode: string | null
+          capacity: number | null
+          code: string
+          created_at: string | null
+          current_count: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          position_x: number | null
+          position_y: number | null
+          shelf_id: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          barcode?: string | null
+          capacity?: number | null
+          code: string
+          created_at?: string | null
+          current_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          position_x?: number | null
+          position_y?: number | null
+          shelf_id: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          barcode?: string | null
+          capacity?: number | null
+          code?: string
+          created_at?: string | null
+          current_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          position_x?: number | null
+          position_y?: number | null
+          shelf_id?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "racks_shelf_id_fkey"
+            columns: ["shelf_id"]
+            isOneToOne: false
+            referencedRelation: "shelves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shelves: {
+        Row: {
+          code: string
+          created_at: string | null
+          depth_cm: number | null
+          height_cm: number | null
+          id: string
+          is_active: boolean | null
+          max_weight_kg: number | null
+          name: string
+          updated_at: string | null
+          user_id: string
+          width_cm: number | null
+          zone_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          depth_cm?: number | null
+          height_cm?: number | null
+          id?: string
+          is_active?: boolean | null
+          max_weight_kg?: number | null
+          name: string
+          updated_at?: string | null
+          user_id: string
+          width_cm?: number | null
+          zone_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          depth_cm?: number | null
+          height_cm?: number | null
+          id?: string
+          is_active?: boolean | null
+          max_weight_kg?: number | null
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+          width_cm?: number | null
+          zone_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shelves_zone_id_fkey"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "zones"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       storage_analytics: {
         Row: {
@@ -378,6 +586,95 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      warehouses: {
+        Row: {
+          address: string | null
+          code: string
+          created_at: string | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          manager_name: string | null
+          name: string
+          phone: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          code: string
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          manager_name?: string | null
+          name: string
+          phone?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          code?: string
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          manager_name?: string | null
+          name?: string
+          phone?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      zones: {
+        Row: {
+          code: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          temperature_controlled: boolean | null
+          updated_at: string | null
+          user_id: string
+          warehouse_id: string
+          zone_type: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          temperature_controlled?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          warehouse_id: string
+          zone_type?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          temperature_controlled?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          warehouse_id?: string
+          zone_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zones_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
