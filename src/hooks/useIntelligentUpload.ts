@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -101,6 +101,60 @@ export const useIntelligentUpload = () => {
   const [uploadState, setUploadState] = useState<UploadState>(initialState);
   const { user } = useAuth();
   const { toast } = useToast();
+
+  // Auto-validate when state changes
+  useEffect(() => {
+    const errors: string[] = [];
+    const metadataValidation: Record<string, string> = {};
+
+    // File validation
+    if (uploadState.files.length === 0) {
+      errors.push('Please select at least one file');
+    }
+
+    // Customer validation
+    if (!uploadState.customer) {
+      errors.push('Please select a customer');
+    }
+
+    // Document type validation
+    if (!uploadState.documentType) {
+      errors.push('Please specify document type');
+    }
+
+    // Location assignment validation
+    if (!uploadState.locationAssignment.assignedRack) {
+      errors.push('Please assign a storage location');
+    }
+
+    // Required metadata validation
+    if (uploadState.documentType?.requiredMetadata) {
+      uploadState.documentType.requiredMetadata.forEach(field => {
+        if (!uploadState.metadata[field] || uploadState.metadata[field].trim() === '') {
+          metadataValidation[field] = 'This field is required';
+          errors.push(`Missing required field: ${field}`);
+        }
+      });
+    }
+
+    // Always require title
+    if (!uploadState.metadata.title || uploadState.metadata.title.trim() === '') {
+      metadataValidation.title = 'Document title is required';
+      errors.push('Document title is required');
+    }
+
+    const validationStatus: ValidationStatus = {
+      isValid: errors.length === 0,
+      errors,
+      fileValidation: {},
+      metadataValidation
+    };
+
+    setUploadState(prev => ({
+      ...prev,
+      validationStatus
+    }));
+  }, [uploadState.files, uploadState.customer, uploadState.documentType, uploadState.locationAssignment, uploadState.metadata]);
 
   const validateUpload = useCallback(() => {
     const errors: string[] = [];
