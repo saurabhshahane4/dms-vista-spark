@@ -29,7 +29,7 @@ interface AssignedDocument {
 
 const RackAssignment = () => {
   const { user } = useAuth();
-  const { warehouses, racks, getWarehouseHierarchy, assignDocumentToRack } = useWarehouse();
+  const { warehouses, racks, getWarehouseHierarchy, assignDocumentToRack, moveDocumentToRack } = useWarehouse();
   const { documents } = useDocuments();
   
   const [barcodeSearch, setBarcodeSearch] = useState('');
@@ -38,7 +38,11 @@ const RackAssignment = () => {
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [assignmentDialog, setAssignmentDialog] = useState(false);
   const [moveDialog, setMoveDialog] = useState(false);
+  const [reassignDialog, setReassignDialog] = useState(false);
   const [assignmentNotes, setAssignmentNotes] = useState('');
+  const [reassignNotes, setReassignNotes] = useState('');
+  const [selectedAssignment, setSelectedAssignment] = useState<AssignedDocument | null>(null);
+  const [newRack, setNewRack] = useState<any>(null);
   const [assignedDocuments, setAssignedDocuments] = useState<AssignedDocument[]>([]);
   const [locationHistory, setLocationHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -186,6 +190,72 @@ const RackAssignment = () => {
       setAssignmentNotes('');
       setSelectedDocument(null);
       await fetchAssignedDocuments();
+    }
+  };
+
+  // Handle document re-assignment
+  const handleReassignDocument = async () => {
+    if (!selectedAssignment || !newRack) return;
+
+    const result = await moveDocumentToRack(
+      selectedAssignment.document_id,
+      selectedAssignment.rack_id,
+      newRack.id,
+      'reassigned',
+      reassignNotes
+    );
+
+    if (result) {
+      setReassignDialog(false);
+      setReassignNotes('');
+      setSelectedAssignment(null);
+      setNewRack(null);
+      await fetchAssignedDocuments();
+    }
+  };
+
+  // Search rack for reassignment
+  const searchRackForReassign = async (barcode: string) => {
+    if (!barcode.trim() || !user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('racks')
+        .select(`
+          *,
+          shelves(
+            *,
+            zones(
+              *,
+              warehouses(*)
+            )
+          )
+        `)
+        .eq('user_id', user.id)
+        .or(`barcode.eq.${barcode},code.eq.${barcode}`)
+        .single();
+
+      if (error) {
+        toast({
+          title: "Rack Not Found",
+          description: "No rack found with the specified barcode or code",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setNewRack(data);
+      toast({
+        title: "Rack Found",
+        description: `Found rack: ${data.name} (${data.code})`,
+      });
+    } catch (error) {
+      console.error('Error searching rack:', error);
+      toast({
+        title: "Error",
+        description: "Failed to search for rack",
+        variant: "destructive",
+      });
     }
   };
 
@@ -393,8 +463,16 @@ const RackAssignment = () => {
                     <TableCell>{new Date(assignment.assigned_at).toLocaleDateString()}</TableCell>
                     <TableCell className="max-w-xs truncate">{assignment.notes || '-'}</TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="sm">
-                        <Move className="w-4 h-4" />
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => {
+                          setSelectedAssignment(assignment);
+                          setReassignDialog(true);
+                        }}
+                      >
+                        <Move className="w-4 h-4 mr-2" />
+                        Re-assign
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -470,6 +548,107 @@ const RackAssignment = () => {
             </Button>
             <Button onClick={handleAssignDocument}>
               Assign Document
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Re-assignment Dialog */}
+      <Dialog open={reassignDialog} onOpenChange={setReassignDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Re-assign Document</DialogTitle>
+            <DialogDescription>
+              Move "{selectedAssignment?.document_name}" to a different rack
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* Current Location */}
+            <div className="p-4 bg-muted rounded-lg">
+              <Label className="text-sm font-medium">Current Location</Label>
+              <p className="text-sm text-muted-foreground mt-1">
+                {selectedAssignment?.full_path}
+              </p>
+            </div>
+
+            {/* New Rack Selection */}
+            <div>
+              <Label className="text-sm font-medium">Select New Rack</Label>
+              <div className="flex gap-2 mt-2">
+                <Input
+                  placeholder="Enter rack barcode or code..."
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      searchRackForReassign(e.currentTarget.value);
+                    }
+                  }}
+                />
+                <Button
+                  variant="outline"
+                  onClick={(e) => {
+                    const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                    searchRackForReassign(input.value);
+                  }}
+                >
+                  <Search className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* New Rack Info */}
+            {newRack && (
+              <div className="p-4 border rounded-lg">
+                <Label className="text-sm font-medium">New Location</Label>
+                <div className="grid grid-cols-2 gap-4 mt-2">
+                  <div>
+                    <span className="text-sm text-muted-foreground">Name:</span>
+                    <p className="font-medium">{newRack.name}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-muted-foreground">Code:</span>
+                    <p className="font-medium">{newRack.code}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-muted-foreground">Capacity:</span>
+                    <p>{newRack.current_count}/{newRack.capacity}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-muted-foreground">Status:</span>
+                    <Badge variant="secondary" className={getStatusColor(newRack.status)}>
+                      {newRack.status}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Notes */}
+            <div>
+              <Label htmlFor="reassign-notes">Reason for Re-assignment (optional)</Label>
+              <Textarea
+                id="reassign-notes"
+                placeholder="Enter reason for moving this document..."
+                value={reassignNotes}
+                onChange={(e) => setReassignNotes(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setReassignDialog(false);
+                setNewRack(null);
+                setReassignNotes('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleReassignDocument}
+              disabled={!newRack}
+            >
+              Re-assign Document
             </Button>
           </DialogFooter>
         </DialogContent>
