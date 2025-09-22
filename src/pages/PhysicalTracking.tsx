@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileText, MapPin, Package, Calendar, User, Building2, Archive, Box, BarChart, CheckCircle, ScanLine, Download, History } from 'lucide-react';
+import { FileText, MapPin, Package, Calendar, User, Building2, Archive, Box, BarChart, CheckCircle, ScanLine, Download, History, Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useWarehouseNavigation } from '@/contexts/WarehouseContext';
 import WarehouseModule from '@/components/warehouse/WarehouseModule';
 import LocationHistory from '@/components/warehouse/LocationHistory';
+import RackAssignment from '@/pages/RackAssignment';
+import CustomerRackAssignment from '@/pages/CustomerRackAssignment';
 
 const physicalStats = {
   totalFiles: 8234,
@@ -41,6 +43,7 @@ const recentActivity = [
 
 const PhysicalTracking = () => {
   const [activeSubTab, setActiveSubTab] = useState("overview");
+  const [storageSubTab, setStorageSubTab] = useState("locations");
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -299,7 +302,46 @@ const PhysicalTracking = () => {
         </TabsContent>
 
         <TabsContent value="locations" className="space-y-6 mt-6">
-          <WarehouseModule />
+          <Tabs value={storageSubTab} onValueChange={setStorageSubTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="locations" className="flex items-center gap-2">
+                <Building2 className="w-4 h-4" />
+                Storage Locations
+              </TabsTrigger>
+              <TabsTrigger value="rack-assignment" className="flex items-center gap-2">
+                <Package className="w-4 h-4" />
+                Rack Assignment
+              </TabsTrigger>
+              <TabsTrigger value="customer-assignment" className="flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                Customer Assignment
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="flex items-center gap-2">
+                <BarChart className="w-4 h-4" />
+                Analytics
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="locations" className="mt-6">
+              <WarehouseModule />
+            </TabsContent>
+
+            <TabsContent value="rack-assignment" className="mt-6">
+              <RackAssignment />
+            </TabsContent>
+
+            <TabsContent value="customer-assignment" className="mt-6">
+              <CustomerRackAssignment />
+            </TabsContent>
+
+            <TabsContent value="analytics" className="mt-6">
+              <div className="text-center py-12">
+                <BarChart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-foreground mb-2">Storage Analytics</h3>
+                <p className="text-muted-foreground">Detailed analytics for storage utilization and performance.</p>
+              </div>
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         <TabsContent value="history" className="space-y-6 mt-6">

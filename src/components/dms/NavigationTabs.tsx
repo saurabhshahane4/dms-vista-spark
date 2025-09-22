@@ -2,7 +2,7 @@ import { useNavigation } from "@/contexts/NavigationContext";
 
 const NavigationTabs = () => {
   const { activeTab, setActiveTab } = useNavigation();
-  const tabs = ["Dashboard", "Documents", "Physical Tracking", "Workflow", "Rack Assignment", "Customer Rack Assignment", "Analytics"] as const;
+  const tabs = ["Dashboard", "Documents", "Physical Tracking", "Workflow", "Analytics"] as const;
   
   return (
     <nav className="border-b border-border px-6 bg-muted/30">

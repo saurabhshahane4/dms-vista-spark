@@ -12,8 +12,6 @@ import EnhancedUpload from "@/pages/EnhancedUpload";
 import Scan from "@/pages/Scan";
 import Settings from "@/pages/Settings";
 import MetadataTypes from "@/pages/MetadataTypes";
-import RackAssignment from "@/pages/RackAssignment";
-import CustomerRackAssignment from "@/pages/CustomerRackAssignment";
 import { UserRoleManager } from "@/components/admin/UserRoleManager";
 import { FileText, Archive, Clock, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -136,10 +134,6 @@ const Index = () => {
         {activeTab === 'Physical Tracking' && <PhysicalTracking />}
 
         {activeTab === 'Workflow' && <Workflow />}
-
-        {activeTab === 'Rack Assignment' && <RackAssignment />}
-
-        {activeTab === 'Customer Rack Assignment' && <CustomerRackAssignment />}
 
         {activeTab === 'Analytics' && <Analytics />}
       </main>
