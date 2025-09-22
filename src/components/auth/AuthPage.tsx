@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +18,7 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   if (user) {
     return <Navigate to="/" replace />;
@@ -36,19 +38,19 @@ const AuthPage = () => {
 
       if (result.error) {
         toast({
-          title: 'Error',
+          title: t('error'),
           description: result.error.message,
           variant: 'destructive',
         });
       } else if (!isLogin) {
         toast({
-          title: 'Success',
+          title: t('success'),
           description: 'Account created successfully! Please check your email.',
         });
       }
     } catch (error) {
       toast({
-        title: 'Error',
+        title: t('error'),
         description: 'An unexpected error occurred',
         variant: 'destructive',
       });
@@ -66,19 +68,20 @@ const AuthPage = () => {
               <div className="w-3 h-3 bg-dms-purple rounded-sm"></div>
             </div>
           </div>
-          <CardTitle>Document Archiving System</CardTitle>
+          <CardTitle>{t('documentArchivingSystem')}</CardTitle>
           <CardDescription>
-            {isLogin ? 'Sign in to your account' : 'Create a new account'}
+            {isLogin ? t('signInToAccount') : t('createNewAccount')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div className="space-y-2">
-                <Label htmlFor="displayName">Display Name</Label>
+                <Label htmlFor="displayName">{t('displayName')}</Label>
                 <Input
                   id="displayName"
                   type="text"
+                  placeholder={t('enterDisplayName')}
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   required={!isLogin}
@@ -86,30 +89,32 @@ const AuthPage = () => {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 type="email"
+                placeholder={t('enterEmail')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 type="password"
+                placeholder={t('enterPassword')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location">{t('location')}</Label>
               <Select value={location} onValueChange={setLocation} required>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select your location" />
+                  <SelectValue placeholder={t('selectLocation')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="warehouse-1">Jumeirah</SelectItem>
@@ -118,7 +123,7 @@ const AuthPage = () => {
               </Select>
             </div>
             <Button type="submit" className="w-full" disabled={loading || !location}>
-              {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Sign Up')}
+              {loading ? t('loading') : (isLogin ? t('signIn') : t('signUp'))}
             </Button>
           </form>
           <div className="text-center mt-4">
@@ -127,7 +132,7 @@ const AuthPage = () => {
               onClick={() => setIsLogin(!isLogin)}
               className="text-sm"
             >
-              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+              {isLogin ? t('dontHaveAccount') : t('alreadyHaveAccount')}
             </Button>
           </div>
         </CardContent>

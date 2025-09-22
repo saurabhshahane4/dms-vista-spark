@@ -29,7 +29,7 @@ const Header = () => {
               <p className="text-sm text-muted-foreground">AI-Powered Document Management</p>
             </div>
           </div>
-          <div className="animate-pulse">Loading...</div>
+          <div className="animate-pulse">{t('loading')}</div>
         </div>
       </header>
     );

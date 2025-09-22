@@ -42,7 +42,7 @@ const QuickActions = () => {
           </div>
           <div>
             <h3 className="text-lg font-semibold text-foreground">{t('quickActions')}</h3>
-            <p className="text-sm text-muted-foreground">Frequently used operations</p>
+            <p className="text-sm text-muted-foreground">{t('frequentlyUsedOperations')}</p>
           </div>
         </div>
 
@@ -97,16 +97,16 @@ const QuickActions = () => {
       <Dialog open={scanModalOpen} onOpenChange={setScanModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Scan Physical Document</DialogTitle>
+            <DialogTitle>{t('scanPhysicalDocument')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="text-center py-8">
               <ScanLine className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">Barcode Scanner</h3>
-              <p className="text-muted-foreground mb-4">Position the barcode within the frame to scan</p>
+              <h3 className="text-lg font-semibold text-foreground mb-2">{t('barcodeScanner')}</h3>
+              <p className="text-muted-foreground mb-4">{t('positionBarcodeInFrame')}</p>
               <Button className="bg-orange-500 hover:bg-orange-600">
                 <ScanLine className="w-4 h-4 mr-2" />
-                Start Scanning
+                {t('startScanning')}
               </Button>
             </div>
           </div>
@@ -117,25 +117,25 @@ const QuickActions = () => {
       <Dialog open={reportsModalOpen} onOpenChange={setReportsModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Generate Reports</DialogTitle>
+            <DialogTitle>{t('generateReports')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-3">
               <Button variant="outline" className="w-full justify-start">
                 <BarChart3 className="w-4 h-4 mr-2" />
-                Document Usage Report
+                {t('documentUsageReport')}
               </Button>
               <Button variant="outline" className="w-full justify-start">
                 <BarChart3 className="w-4 h-4 mr-2" />
-                Compliance Report
+                {t('complianceReport')}
               </Button>
               <Button variant="outline" className="w-full justify-start">
                 <BarChart3 className="w-4 h-4 mr-2" />
-                User Activity Report
+                {t('userActivityReport')}
               </Button>
               <Button variant="outline" className="w-full justify-start">
                 <BarChart3 className="w-4 h-4 mr-2" />
-                Storage Analytics
+                {t('storageAnalytics')}
               </Button>
             </div>
           </div>

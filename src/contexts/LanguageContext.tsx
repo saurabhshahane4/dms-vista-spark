@@ -82,6 +82,10 @@ const translations = {
     location: 'Location',
     signUp: 'Sign Up',
     login: 'Login',
+    signInToAccount: 'Sign in to your account',
+    createNewAccount: 'Create a new account',
+    dontHaveAccount: "Don't have an account? Sign up",
+    alreadyHaveAccount: 'Already have an account? Sign in',
     
     // Common
     yes: 'Yes',
@@ -99,9 +103,62 @@ const translations = {
     scanBarcode: 'Scan Barcode',
     reports: 'Reports',
     scan: 'Scan',
+    frequentlyUsedOperations: 'Frequently used operations',
+    
+    // Placeholders & Forms
+    enterEmail: 'Enter your email',
+    enterPassword: 'Enter your password',
+    enterDisplayName: 'Enter your display name',
+    selectLocation: 'Select your location',
+    searchPlaceholder: 'Search documents...',
+    enterDocumentName: 'Enter document name',
+    enterTags: 'Tags (comma-separated)',
+    
+    // File Operations
+    selectFile: 'Select File',
+    documentName: 'Document Name',
+    tags: 'Tags',
+    downloadDocument: 'Download Document',
+    shareDocument: 'Share Document',
+    
+    // Modals & Dialogs
+    scanPhysicalDocument: 'Scan Physical Document',
+    barcodeScanner: 'Barcode Scanner',
+    positionBarcodeInFrame: 'Position the barcode within the frame to scan',
+    startScanning: 'Start Scanning',
+    generateReports: 'Generate Reports',
+    
+    // Reports
+    documentUsageReport: 'Document Usage Report',
+    complianceReport: 'Compliance Report',
+    userActivityReport: 'User Activity Report',
+    storageAnalytics: 'Storage Analytics',
+    
+    // AI Search suggestions
+    showFinancialReports: 'Show me financial reports from this quarter',
+    findSafetyDocuments: 'Find safety and compliance documents',
+    locateContract: 'Locate contract with ABC Corp',
+    summarizeMeetingMinutes: 'Summarize recent meeting minutes',
     
     // Stats Changes
-    from_last_month: 'from last month'
+    from_last_month: 'from last month',
+    
+    // General Messages
+    archiving: 'Archiving...',
+    failedToLoad: 'Failed to load',
+    tryAgain: 'Try again',
+    noItemsFound: 'No items found',
+    
+    // Form Validation
+    required: 'This field is required',
+    invalidEmail: 'Please enter a valid email address',
+    passwordTooShort: 'Password must be at least 6 characters',
+    
+    // Toast Messages
+    operationSuccessful: 'Operation completed successfully',
+    operationFailed: 'Operation failed. Please try again.',
+    documentArchived: 'Active documents have been archived successfully',
+    archiveError: 'Failed to archive documents. Please try again.'
   },
   ar: {
     // Header & Navigation  
@@ -175,6 +232,10 @@ const translations = {
     location: 'الموقع',
     signUp: 'إنشاء حساب',
     login: 'تسجيل الدخول',
+    signInToAccount: 'تسجيل الدخول إلى حسابك',
+    createNewAccount: 'إنشاء حساب جديد',
+    dontHaveAccount: 'لا تملك حساباً؟ إنشاء حساب',
+    alreadyHaveAccount: 'تملك حساباً بالفعل؟ تسجيل الدخول',
     
     // Common
     yes: 'نعم',
@@ -192,9 +253,62 @@ const translations = {
     scanBarcode: 'مسح الباركود',
     reports: 'التقارير',
     scan: 'مسح',
+    frequentlyUsedOperations: 'العمليات الأكثر استخداماً',
+    
+    // Placeholders & Forms
+    enterEmail: 'أدخل بريدك الإلكتروني',
+    enterPassword: 'أدخل كلمة المرور',
+    enterDisplayName: 'أدخل اسم العرض',
+    selectLocation: 'اختر موقعك',
+    searchPlaceholder: 'البحث في المستندات...',
+    enterDocumentName: 'أدخل اسم المستند',
+    enterTags: 'الوسوم (مفصولة بفواصل)',
+    
+    // File Operations
+    selectFile: 'اختر ملف',
+    documentName: 'اسم المستند',
+    tags: 'الوسوم',
+    downloadDocument: 'تحميل المستند',
+    shareDocument: 'مشاركة المستند',
+    
+    // Modals & Dialogs
+    scanPhysicalDocument: 'مسح مستند فعلي',
+    barcodeScanner: 'ماسح الباركود',
+    positionBarcodeInFrame: 'ضع الباركود داخل الإطار للمسح',
+    startScanning: 'بدء المسح',
+    generateReports: 'إنشاء التقارير',
+    
+    // Reports
+    documentUsageReport: 'تقرير استخدام المستندات',
+    complianceReport: 'تقرير الامتثال',
+    userActivityReport: 'تقرير نشاط المستخدم',
+    storageAnalytics: 'تحليلات التخزين',
+    
+    // AI Search suggestions
+    showFinancialReports: 'أظهر لي التقارير المالية لهذا الربع',
+    findSafetyDocuments: 'ابحث عن مستندات السلامة والامتثال',
+    locateContract: 'ابحث عن العقد مع شركة ABC',
+    summarizeMeetingMinutes: 'لخص محاضر الاجتماعات الأخيرة',
     
     // Stats Changes
-    from_last_month: 'من الشهر الماضي'
+    from_last_month: 'من الشهر الماضي',
+    
+    // General Messages
+    archiving: 'جاري الأرشفة...',
+    failedToLoad: 'فشل في التحميل',
+    tryAgain: 'حاول مرة أخرى',
+    noItemsFound: 'لم يتم العثور على عناصر',
+    
+    // Form Validation
+    required: 'هذا الحقل مطلوب',
+    invalidEmail: 'يرجى إدخال بريد إلكتروني صحيح',
+    passwordTooShort: 'كلمة المرور يجب أن تكون على الأقل 6 أحرف',
+    
+    // Toast Messages
+    operationSuccessful: 'تمت العملية بنجاح',
+    operationFailed: 'فشلت العملية. يرجى المحاولة مرة أخرى.',
+    documentArchived: 'تم أرشفة المستندات النشطة بنجاح',
+    archiveError: 'فشل في أرشفة المستندات. يرجى المحاولة مرة أخرى.'
   }
 };
 

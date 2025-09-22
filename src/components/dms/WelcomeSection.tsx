@@ -35,8 +35,8 @@ const WelcomeSection = () => {
       if (error) throw error;
 
       toast({
-        title: 'Success',
-        description: 'Active documents have been archived successfully.',
+        title: t('success'),
+        description: t('documentArchived'),
       });
 
       // Refresh the stats to reflect the change
@@ -44,8 +44,8 @@ const WelcomeSection = () => {
     } catch (error) {
       console.error('Archive error:', error);
       toast({
-        title: 'Archive Error',
-        description: 'Failed to archive documents. Please try again.',
+        title: t('error'),
+        description: t('archiveError'),
         variant: 'destructive',
       });
     } finally {
@@ -86,15 +86,15 @@ const WelcomeSection = () => {
           </div>
 
           <DocumentUpload onUploadComplete={refetch} />
-          <Button 
-            variant="outline" 
-            className="border-dms-purple text-dms-purple hover:bg-dms-purple/10"
-            onClick={handleArchive}
-            disabled={archiving}
-          >
-            <Archive className="w-4 h-4 mr-2" />
-            {archiving ? 'Archiving...' : t('archive')}
-          </Button>
+            <Button 
+              variant="outline" 
+              className="border-dms-purple text-dms-purple hover:bg-dms-purple/10"
+              onClick={handleArchive}
+              disabled={archiving}
+            >
+              <Archive className="w-4 h-4 mr-2" />
+              {archiving ? t('archiving') : t('archive')}
+            </Button>
         </div>
       </div>
     </div>

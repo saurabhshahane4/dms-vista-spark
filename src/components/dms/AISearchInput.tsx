@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -30,13 +31,13 @@ const AISearchInput = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { session } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const suggestedQueries = [
-    "What contracts are pending approval?",
-    "Show me financial reports from this quarter", 
-    "Find safety and compliance documents",
-    "What are the key points in our HR policies?",
-    "Summarize recent meeting minutes"
+    t('showFinancialReports'),
+    t('findSafetyDocuments'), 
+    t('locateContract'),
+    t('summarizeMeetingMinutes')
   ];
 
   const handleSearch = async (searchQuery: string) => {
@@ -112,7 +113,7 @@ const AISearchInput = () => {
         data-ai-search-trigger
       >
         <Search className="w-4 h-4" />
-        <span className="hidden md:inline">AI Search</span>
+        <span className="hidden md:inline">{t('aiSearch')}</span>
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -124,7 +125,7 @@ const AISearchInput = () => {
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <DialogTitle className="text-lg font-semibold text-foreground">AI Document Search</DialogTitle>
+                  <DialogTitle className="text-lg font-semibold text-foreground">{t('aiSearch')}</DialogTitle>
                   <p className="text-sm text-muted-foreground">Ask me anything about your documents</p>
                 </div>
               </div>
