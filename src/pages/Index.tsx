@@ -9,6 +9,7 @@ import PhysicalTracking from "@/pages/PhysicalTracking";
 import Workflow from "@/pages/Workflow";
 import Analytics from "@/pages/Analytics";
 import IntelligentUpload from "@/pages/IntelligentUpload";
+import DocumentLookup from "@/pages/DocumentLookup";
 import Scan from "@/pages/Scan";
 import Settings from "@/pages/Settings";
 import MetadataTypes from "@/pages/MetadataTypes";
@@ -26,6 +27,11 @@ const Index = () => {
   // Check if we should show the intelligent upload page
   if (activeTab === 'IntelligentUpload') {
     return <IntelligentUpload />;
+  }
+
+  // Check if we should show the document lookup page
+  if (activeTab === 'DocumentLookup') {
+    return <DocumentLookup />;
   }
 
   // Check if we should show the scan page

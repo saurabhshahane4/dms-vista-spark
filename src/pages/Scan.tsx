@@ -396,6 +396,27 @@ const Scan = () => {
             </Button>
           </div>
         </Card>
+
+        {/* Barcode Scan Button */}
+        <Card className="p-6 bg-blue-50 border-blue-200">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+              <ScanLine className="w-4 h-4 text-white" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground">Quick Barcode Lookup</h3>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Quickly scan or search for documents using barcodes with our advanced search interface.
+          </p>
+          <Button 
+            size="lg"
+            className="w-full max-w-sm h-16 text-lg bg-primary hover:bg-primary/90"
+            onClick={() => setActiveTab('DocumentLookup')}
+          >
+            <ScanLine className="w-6 h-6 mr-3" />
+            Scan Barcode
+          </Button>
+        </Card>
       </div>
     </div>
   );

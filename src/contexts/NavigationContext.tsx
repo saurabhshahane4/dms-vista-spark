@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 
-type NavigationTab = 'Dashboard' | 'Documents' | 'Physical Tracking' | 'Workflow' | 'Analytics' | 'IntelligentUpload' | 'Scan' | 'Settings' | 'MetadataTypes' | 'UserManagement';
+type NavigationTab = 'Dashboard' | 'Documents' | 'Physical Tracking' | 'Workflow' | 'Analytics' | 'IntelligentUpload' | 'DocumentLookup' | 'Scan' | 'Settings' | 'MetadataTypes' | 'UserManagement';
 
 interface NavigationContextType {
   activeTab: NavigationTab;
