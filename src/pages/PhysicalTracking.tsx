@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileText, MapPin, Package, Calendar, User, Building2, Archive, Box, BarChart, CheckCircle, ScanLine, Download, History, Users, Plus, Search, Move, Tag, Clock, TrendingUp, Activity, Zap, Star, BookOpen } from 'lucide-react';
+import { FileText, MapPin, Package, Calendar, User, Building2, Archive, Box, BarChart, CheckCircle, ScanLine, Download, History, Users, Upload, Search, Move, Tag, Clock, TrendingUp, Activity, Zap, Star, BookOpen, Brain, FileUp, BarChart3 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -175,22 +175,34 @@ const PhysicalTracking = () => {
               <Button 
                 variant="outline" 
                 className="h-20 flex-col gap-2 hover:bg-accent/50"
+                onClick={() => setActiveTab('IntelligentUpload')}
+              >
+                <Upload className="w-6 h-6 text-blue-600" />
+                <span className="text-sm font-medium">Upload</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-20 flex-col gap-2 hover:bg-accent/50"
                 onClick={() => setActiveTab('DocumentLookup')}
               >
-                <Search className="w-6 h-6 text-primary" />
-                <span className="text-sm font-medium">Document Lookup</span>
+                <Brain className="w-6 h-6 text-purple-600" />
+                <span className="text-sm font-medium">AI Search</span>
               </Button>
-              <Button variant="outline" className="h-20 flex-col gap-2 hover:bg-accent/50">
-                <Plus className="w-6 h-6 text-green-600" />
-                <span className="text-sm font-medium">Add Document</span>
+              <Button 
+                variant="outline" 
+                className="h-20 flex-col gap-2 hover:bg-accent/50"
+                onClick={() => setActiveTab('DocumentLookup')}
+              >
+                <ScanLine className="w-6 h-6 text-green-600" />
+                <span className="text-sm font-medium">Scan Barcode</span>
               </Button>
-              <Button variant="outline" className="h-20 flex-col gap-2 hover:bg-accent/50">
-                <Move className="w-6 h-6 text-blue-600" />
-                <span className="text-sm font-medium">Batch Move</span>
-              </Button>
-              <Button variant="outline" className="h-20 flex-col gap-2 hover:bg-accent/50">
-                <Tag className="w-6 h-6 text-purple-600" />
-                <span className="text-sm font-medium">Tag Documents</span>
+              <Button 
+                variant="outline" 
+                className="h-20 flex-col gap-2 hover:bg-accent/50"
+                onClick={() => setActiveTab('Analytics')}
+              >
+                <BarChart3 className="w-6 h-6 text-orange-600" />
+                <span className="text-sm font-medium">Reports</span>
               </Button>
             </div>
           </Card>
