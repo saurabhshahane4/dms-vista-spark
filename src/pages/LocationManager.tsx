@@ -105,6 +105,8 @@ const LocationManager = () => {
       position_x: 0,
       position_y: 0,
       capacity: 10,
+      current_count: 0,
+      status: 'empty',
       is_active: true,
     }
   });

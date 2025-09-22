@@ -230,7 +230,12 @@ export const useWarehouse = () => {
 
       if (warehouseError) throw warehouseError;
       
-      return warehouseData as WarehouseHierarchy;
+      return {
+        id: warehouseData.id,
+        name: warehouseData.name,
+        code: warehouseData.code,
+        zones: warehouseData.zones || [],
+      } as WarehouseHierarchy;
     } catch (error) {
       console.error('Error fetching warehouse hierarchy:', error);
       toast({

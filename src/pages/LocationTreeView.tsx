@@ -12,7 +12,7 @@ interface TreeNode {
   name: string;
   type: 'warehouse' | 'zone' | 'shelf' | 'rack';
   code: string;
-  status?: 'empty' | 'partial' | 'full' | 'over-capacity';
+  status?: string;
   capacity?: number;
   current_count?: number;
   children?: TreeNode[];
@@ -110,17 +110,17 @@ const LocationTreeView = () => {
         
         const filteredChildren = node.children ? filterTree(node.children) : [];
         
-        if (matchesSearch || filteredChildren.length > 0) {
-          filtered.push({
-            ...node,
-            children: filteredChildren,
-          });
-          
-          // Auto-expand matching nodes
-          if (matchesSearch) {
-            setExpandedNodes(prev => new Set([...prev, node.id]));
-          }
-        }
+            if (matchesSearch || filteredChildren.length > 0) {
+              filtered.push({
+                ...node,
+                children: filteredChildren,
+              });
+              
+              // Auto-expand matching nodes
+              if (matchesSearch) {
+                setExpandedNodes(prev => new Set([...prev, node.id]));
+              }
+            }
         
         return filtered;
       }, []);
