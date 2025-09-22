@@ -625,24 +625,50 @@ export const useWarehouse = () => {
     try {
       let query = supabase
         .from('location_history')
-        .select(`
-          *,
-          documents(name),
-          from_racks:from_rack_id(code, barcode, name),
-          to_racks:to_rack_id(code, barcode, name)
-        `)
+        .select('*')
         .eq('user_id', user.id);
 
       if (documentId) {
         query = query.eq('document_id', documentId);
       }
 
-      const { data, error } = await query
+      const { data: historyData, error } = await query
         .order('moved_at', { ascending: false })
         .limit(100);
 
       if (error) throw error;
-      setLocationHistory(data || []);
+
+      // Manually fetch related data
+      if (historyData && historyData.length > 0) {
+        const documentIds = [...new Set(historyData.map(h => h.document_id))];
+        const fromRackIds = [...new Set(historyData.map(h => h.from_rack_id).filter(Boolean))];
+        const toRackIds = [...new Set(historyData.map(h => h.to_rack_id).filter(Boolean))];
+        const allRackIds = [...new Set([...fromRackIds, ...toRackIds])];
+
+        // Fetch documents
+        const { data: documents } = await supabase
+          .from('documents')
+          .select('id, name')
+          .in('id', documentIds);
+
+        // Fetch racks
+        const { data: racks } = await supabase
+          .from('racks')
+          .select('id, code, barcode, name')
+          .in('id', allRackIds);
+
+        // Combine data
+        const enrichedHistory = historyData.map(history => ({
+          ...history,
+          documents: documents?.find(d => d.id === history.document_id),
+          from_racks: history.from_rack_id ? racks?.find(r => r.id === history.from_rack_id) : null,
+          to_racks: history.to_rack_id ? racks?.find(r => r.id === history.to_rack_id) : null,
+        }));
+
+        setLocationHistory(enrichedHistory);
+      } else {
+        setLocationHistory([]);
+      }
     } catch (error) {
       console.error('Error fetching location history:', error);
       toast({
