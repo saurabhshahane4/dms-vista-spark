@@ -102,6 +102,7 @@ const Documents = () => {
   const { folders, allFolders, loading, refetch, currentFolderId, breadcrumb, navigateToFolder } = useDocuments();
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Load view preference from localStorage
   useEffect(() => {
