@@ -122,7 +122,7 @@ export const useWarehouse = () => {
     }
   }, [user]);
 
-  // Fetch zones for a warehouse
+  // Fetch zones
   const fetchZones = useCallback(async (warehouseId?: string) => {
     if (!user) return;
 
@@ -150,7 +150,7 @@ export const useWarehouse = () => {
     }
   }, [user]);
 
-  // Fetch shelves for a zone
+  // Fetch shelves
   const fetchShelves = useCallback(async (zoneId?: string) => {
     if (!user) return;
 
@@ -178,7 +178,7 @@ export const useWarehouse = () => {
     }
   }, [user]);
 
-  // Fetch racks for a shelf
+  // Fetch racks
   const fetchRacks = useCallback(async (shelfId?: string) => {
     if (!user) return;
 
@@ -211,7 +211,6 @@ export const useWarehouse = () => {
     if (!user) return null;
 
     try {
-      // Fetch warehouse with all nested data
       const { data: warehouseData, error: warehouseError } = await supabase
         .from('warehouses')
         .select(`
@@ -247,7 +246,7 @@ export const useWarehouse = () => {
     }
   }, [user]);
 
-  // CRUD Operations
+  // Warehouse CRUD operations
   const createWarehouse = useCallback(async (warehouse: Omit<Warehouse, 'id' | 'created_at' | 'updated_at'>) => {
     if (!user) return null;
 
@@ -340,7 +339,7 @@ export const useWarehouse = () => {
     }
   }, [user, fetchWarehouses]);
 
-  // Similar CRUD operations for zones, shelves, racks
+  // Zone CRUD operations
   const createZone = useCallback(async (zone: Omit<Zone, 'id' | 'created_at' | 'updated_at'>) => {
     if (!user) return null;
 
@@ -371,13 +370,76 @@ export const useWarehouse = () => {
     }
   }, [user, fetchZones]);
 
-  const createShelf = useCallback(async (shelf: Omit<Shelf, 'id' | 'created_at' | 'updated_at'>) => {
+  const updateZone = useCallback(async (id: string, updates: Partial<Zone>) => {
+    if (!user) return null;
+
+    try {
+      const { data, error } = await supabase
+        .from('zones')
+        .update(updates)
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Zone updated successfully",
+      });
+
+      await fetchZones();
+      return data;
+    } catch (error) {
+      console.error('Error updating zone:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update zone",
+        variant: "destructive",
+      });
+      return null;
+    }
+  }, [user, fetchZones]);
+
+  const deleteZone = useCallback(async (id: string) => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('zones')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Zone deleted successfully",
+      });
+
+      await fetchZones();
+      return true;
+    } catch (error) {
+      console.error('Error deleting zone:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete zone",
+        variant: "destructive",
+      });
+      return false;
+    }
+  }, [user, fetchZones]);
+
+  // Shelf CRUD operations
+  const createShelf = useCallback(async (shelfData: Omit<Shelf, 'id' | 'created_at' | 'updated_at'>) => {
     if (!user) return null;
 
     try {
       const { data, error } = await supabase
         .from('shelves')
-        .insert({ ...shelf, user_id: user.id })
+        .insert({ ...shelfData, user_id: user.id })
         .select()
         .single();
 
@@ -401,13 +463,76 @@ export const useWarehouse = () => {
     }
   }, [user, fetchShelves]);
 
-  const createRack = useCallback(async (rack: Omit<Rack, 'id' | 'created_at' | 'updated_at'>) => {
+  const updateShelf = useCallback(async (id: string, updates: Partial<Shelf>) => {
+    if (!user) return null;
+
+    try {
+      const { data, error } = await supabase
+        .from('shelves')
+        .update(updates)
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Shelf updated successfully",
+      });
+
+      await fetchShelves();
+      return data;
+    } catch (error) {
+      console.error('Error updating shelf:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update shelf",
+        variant: "destructive",
+      });
+      return null;
+    }
+  }, [user, fetchShelves]);
+
+  const deleteShelf = useCallback(async (id: string) => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('shelves')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Shelf deleted successfully",
+      });
+
+      await fetchShelves();
+      return true;
+    } catch (error) {
+      console.error('Error deleting shelf:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete shelf",
+        variant: "destructive",
+      });
+      return false;
+    }
+  }, [user, fetchShelves]);
+
+  // Rack CRUD operations
+  const createRack = useCallback(async (rackData: Omit<Rack, 'id' | 'created_at' | 'updated_at'>) => {
     if (!user) return null;
 
     try {
       const { data, error } = await supabase
         .from('racks')
-        .insert({ ...rack, user_id: user.id })
+        .insert({ ...rackData, user_id: user.id })
         .select()
         .single();
 
@@ -428,6 +553,68 @@ export const useWarehouse = () => {
         variant: "destructive",
       });
       return null;
+    }
+  }, [user, fetchRacks]);
+
+  const updateRack = useCallback(async (id: string, updates: Partial<Rack>) => {
+    if (!user) return null;
+
+    try {
+      const { data, error } = await supabase
+        .from('racks')
+        .update(updates)
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Rack updated successfully",
+      });
+
+      await fetchRacks();
+      return data;
+    } catch (error) {
+      console.error('Error updating rack:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update rack",
+        variant: "destructive",
+      });
+      return null;
+    }
+  }, [user, fetchRacks]);
+
+  const deleteRack = useCallback(async (id: string) => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('racks')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Rack deleted successfully",
+      });
+
+      await fetchRacks();
+      return true;
+    } catch (error) {
+      console.error('Error deleting rack:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete rack",
+        variant: "destructive",
+      });
+      return false;
     }
   }, [user, fetchRacks]);
 
@@ -502,8 +689,14 @@ export const useWarehouse = () => {
     updateWarehouse,
     deleteWarehouse,
     createZone,
+    updateZone,
+    deleteZone,
     createShelf,
+    updateShelf,
+    deleteShelf,
     createRack,
+    updateRack,
+    deleteRack,
     
     // Document location management
     assignDocumentToRack,

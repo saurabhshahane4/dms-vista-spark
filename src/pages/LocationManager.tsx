@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Building2, MapPin, Box, Archive } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -68,8 +68,14 @@ const LocationManager = () => {
     updateWarehouse,
     deleteWarehouse,
     createZone,
+    updateZone,
+    deleteZone,
     createShelf,
+    updateShelf,
+    deleteShelf,
     createRack,
+    updateRack,
+    deleteRack,
     fetchZones,
     fetchShelves,
     fetchRacks,
@@ -149,8 +155,13 @@ const LocationManager = () => {
   const handleDelete = async (type: string, id: string) => {
     if (type === 'warehouse') {
       await deleteWarehouse(id);
+    } else if (type === 'zone') {
+      await deleteZone(id);
+    } else if (type === 'shelf') {
+      await deleteShelf(id);
+    } else if (type === 'rack') {
+      await deleteRack(id);
     }
-    // Add similar handlers for other types
     setDeleteConfirm(null);
   };
 
@@ -175,6 +186,17 @@ const LocationManager = () => {
     setActiveTab(type);
     setIsDialogOpen(true);
   };
+
+  // Load initial data when switching tabs
+  useEffect(() => {
+    if (activeTab === 'zones') {
+      fetchZones();
+    } else if (activeTab === 'shelves') {
+      fetchShelves();
+    } else if (activeTab === 'racks') {
+      fetchRacks();
+    }
+  }, [activeTab, fetchZones, fetchShelves, fetchRacks]);
 
   const getStatusBadge = (isActive: boolean) => (
     <Badge variant={isActive ? "default" : "secondary"}>
@@ -314,10 +336,18 @@ const LocationManager = () => {
                     <TableCell>{getStatusBadge(zone.is_active)}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openEditDialog('zone', zone)}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeleteConfirm({ type: 'zone', id: zone.id, name: zone.name })}
+                        >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -364,10 +394,18 @@ const LocationManager = () => {
                     <TableCell>{getStatusBadge(shelf.is_active)}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openEditDialog('shelf', shelf)}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeleteConfirm({ type: 'shelf', id: shelf.id, name: shelf.name })}
+                        >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -411,10 +449,18 @@ const LocationManager = () => {
                     <TableCell>{getRackStatusBadge(rack.status)}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openEditDialog('rack', rack)}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeleteConfirm({ type: 'rack', id: rack.id, name: rack.name })}
+                        >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -484,7 +530,204 @@ const LocationManager = () => {
             </form>
           )}
 
-          {/* Add similar forms for zones, shelves, and racks */}
+          {activeTab === 'zones' && (
+            <form onSubmit={zoneForm.handleSubmit(handleCreateZone)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="warehouse_id">Warehouse *</Label>
+                  <Select onValueChange={(value) => zoneForm.setValue('warehouse_id', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select warehouse" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {warehouses.map((warehouse) => (
+                        <SelectItem key={warehouse.id} value={warehouse.id}>
+                          {warehouse.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="zone_type">Zone Type</Label>
+                  <Select onValueChange={(value) => zoneForm.setValue('zone_type', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="standard">Standard</SelectItem>
+                      <SelectItem value="climate-controlled">Climate Controlled</SelectItem>
+                      <SelectItem value="secure">Secure</SelectItem>
+                      <SelectItem value="archive">Archive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name">Name *</Label>
+                  <Input {...zoneForm.register('name', { required: true })} />
+                </div>
+                <div>
+                  <Label htmlFor="code">Code *</Label>
+                  <Input {...zoneForm.register('code', { required: true })} />
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch {...zoneForm.register('temperature_controlled')} />
+                <Label>Temperature Controlled</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch {...zoneForm.register('is_active')} />
+                <Label>Active</Label>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  {editingItem ? 'Update' : 'Create'}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+
+          {activeTab === 'shelves' && (
+            <form onSubmit={shelfForm.handleSubmit(handleCreateShelf)} className="space-y-4">
+              <div>
+                <Label htmlFor="zone_id">Zone *</Label>
+                <Select onValueChange={(value) => shelfForm.setValue('zone_id', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select zone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {zones.map((zone) => (
+                      <SelectItem key={zone.id} value={zone.id}>
+                        {zone.name} ({zone.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name">Name *</Label>
+                  <Input {...shelfForm.register('name', { required: true })} />
+                </div>
+                <div>
+                  <Label htmlFor="code">Code *</Label>
+                  <Input {...shelfForm.register('code', { required: true })} />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="height_cm">Height (cm)</Label>
+                  <Input 
+                    type="number" 
+                    {...shelfForm.register('height_cm', { valueAsNumber: true })} 
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="width_cm">Width (cm)</Label>
+                  <Input 
+                    type="number" 
+                    {...shelfForm.register('width_cm', { valueAsNumber: true })} 
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="depth_cm">Depth (cm)</Label>
+                  <Input 
+                    type="number" 
+                    {...shelfForm.register('depth_cm', { valueAsNumber: true })} 
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="max_weight_kg">Max Weight (kg)</Label>
+                <Input 
+                  type="number" 
+                  {...shelfForm.register('max_weight_kg', { valueAsNumber: true })} 
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch {...shelfForm.register('is_active')} />
+                <Label>Active</Label>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  {editingItem ? 'Update' : 'Create'}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+
+          {activeTab === 'racks' && (
+            <form onSubmit={rackForm.handleSubmit(handleCreateRack)} className="space-y-4">
+              <div>
+                <Label htmlFor="shelf_id">Shelf *</Label>
+                <Select onValueChange={(value) => rackForm.setValue('shelf_id', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select shelf" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {shelves.map((shelf) => (
+                      <SelectItem key={shelf.id} value={shelf.id}>
+                        {shelf.name} ({shelf.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name">Name *</Label>
+                  <Input {...rackForm.register('name', { required: true })} />
+                </div>
+                <div>
+                  <Label htmlFor="code">Code *</Label>
+                  <Input {...rackForm.register('code', { required: true })} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="position_x">Position X</Label>
+                  <Input 
+                    type="number" 
+                    {...rackForm.register('position_x', { valueAsNumber: true })} 
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="position_y">Position Y</Label>
+                  <Input 
+                    type="number" 
+                    {...rackForm.register('position_y', { valueAsNumber: true })} 
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="capacity">Capacity *</Label>
+                <Input 
+                  type="number" 
+                  {...rackForm.register('capacity', { required: true, valueAsNumber: true })} 
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch {...rackForm.register('is_active')} />
+                <Label>Active</Label>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  {editingItem ? 'Update' : 'Create'}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
 
