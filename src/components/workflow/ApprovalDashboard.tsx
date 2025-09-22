@@ -68,7 +68,13 @@ export const ApprovalDashboard = () => {
   };
 
   const filteredPendingApprovals = pendingApprovals.filter(request => {
+    const workflowName = (request as any).workflow_instances?.workflows?.name || 'Unknown Workflow';
+    const contextData = (request as any).workflow_instances?.context_data || {};
+    const documentName = contextData.document_name || '';
+    
     const matchesSearch = searchQuery === '' || 
+      workflowName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      documentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       request.workflow_instance_id.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesPriority = priorityFilter === 'all' || request.priority === priorityFilter;
     return matchesSearch && matchesPriority;
@@ -184,10 +190,10 @@ export const ApprovalDashboard = () => {
                       <div className="space-y-1">
                         <CardTitle className="flex items-center gap-2">
                           <FileText className="h-4 w-4" />
-                          Approval Request #{request.id.slice(0, 8)}
+                          {((request as any).workflow_instances?.context_data?.document_name) || `Request #${request.id.slice(0, 8)}`}
                         </CardTitle>
                         <p className="text-sm text-muted-foreground">
-                          Workflow Instance: {request.workflow_instance_id.slice(0, 8)}
+                          Workflow: {((request as any).workflow_instances?.workflows?.name) || 'Unknown Workflow'}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -348,10 +354,10 @@ export const ApprovalDashboard = () => {
                       <div className="space-y-1">
                         <CardTitle className="flex items-center gap-2">
                           <FileText className="h-4 w-4" />
-                          Request #{request.id.slice(0, 8)}
+                          {((request as any).workflow_instances?.context_data?.document_name) || `Request #${request.id.slice(0, 8)}`}
                         </CardTitle>
                         <p className="text-sm text-muted-foreground">
-                          Workflow: {request.workflow_instance_id.slice(0, 8)}
+                          Workflow: {((request as any).workflow_instances?.workflows?.name) || 'Unknown Workflow'}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
