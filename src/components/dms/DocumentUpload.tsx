@@ -107,7 +107,7 @@ const DocumentUpload = ({ onUploadComplete }: DocumentUploadProps) => {
   };
 
   const handleNewDocument = () => {
-    setActiveTab('EnhancedUpload');
+    setActiveTab('IntelligentUpload');
   };
 
   return (

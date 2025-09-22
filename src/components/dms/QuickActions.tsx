@@ -19,7 +19,7 @@ const QuickActions = () => {
   };
 
   const handleUpload = () => {
-    setActiveTab('EnhancedUpload');
+    setActiveTab('IntelligentUpload');
   };
 
   const handleAISearch = () => {
