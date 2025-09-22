@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useWarehouseNavigation } from '@/contexts/WarehouseContext';
+import { useNavigation } from '@/contexts/NavigationContext';
 import WarehouseModule from '@/components/warehouse/WarehouseModule';
 import LocationHistory from '@/components/warehouse/LocationHistory';
 import RackAssignment from '@/pages/RackAssignment';
@@ -42,6 +43,7 @@ const recentActivity = [
 ];
 
 const PhysicalTracking = () => {
+  const { setActiveTab } = useNavigation();
   const [activeSubTab, setActiveSubTab] = useState("overview");
   const [storageSubTab, setStorageSubTab] = useState("locations");
 
@@ -174,7 +176,10 @@ const PhysicalTracking = () => {
             </div>
 
             <div className="flex gap-3 mb-6">
-              <Button className="bg-primary hover:bg-primary/90">
+              <Button 
+                className="bg-primary hover:bg-primary/90"
+                onClick={() => setActiveTab('DocumentLookup')}
+              >
                 <ScanLine className="w-4 h-4 mr-2" />
                 Scan Barcode
               </Button>
