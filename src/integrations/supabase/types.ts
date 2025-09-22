@@ -14,6 +14,153 @@ export type Database = {
   }
   public: {
     Tables: {
+      assignment_rules: {
+        Row: {
+          capacity_threshold: number | null
+          created_at: string
+          customer_pattern: string | null
+          document_type_conditions: string[] | null
+          fallback_rack_patterns: string[] | null
+          file_size_max: number | null
+          file_size_min: number | null
+          id: string
+          is_active: boolean | null
+          order_by: string | null
+          preferred_rack_patterns: string[] | null
+          priority_level: string | null
+          rule_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          capacity_threshold?: number | null
+          created_at?: string
+          customer_pattern?: string | null
+          document_type_conditions?: string[] | null
+          fallback_rack_patterns?: string[] | null
+          file_size_max?: number | null
+          file_size_min?: number | null
+          id?: string
+          is_active?: boolean | null
+          order_by?: string | null
+          preferred_rack_patterns?: string[] | null
+          priority_level?: string | null
+          rule_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          capacity_threshold?: number | null
+          created_at?: string
+          customer_pattern?: string | null
+          document_type_conditions?: string[] | null
+          fallback_rack_patterns?: string[] | null
+          file_size_max?: number | null
+          file_size_min?: number | null
+          id?: string
+          is_active?: boolean | null
+          order_by?: string | null
+          preferred_rack_patterns?: string[] | null
+          priority_level?: string | null
+          rule_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      customer_rack_assignments: {
+        Row: {
+          assigned_date: string
+          assignment_type: string | null
+          capacity_threshold: number | null
+          created_at: string
+          customer_id: string
+          document_types: string[] | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          priority_order: number | null
+          rack_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_date?: string
+          assignment_type?: string | null
+          capacity_threshold?: number | null
+          created_at?: string
+          customer_id: string
+          document_types?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          priority_order?: number | null
+          rack_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_date?: string
+          assignment_type?: string | null
+          capacity_threshold?: number | null
+          created_at?: string
+          customer_id?: string
+          document_types?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          priority_order?: number | null
+          rack_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      customers: {
+        Row: {
+          address: string | null
+          auto_assignment_enabled: boolean | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          customer_code: string
+          document_types: string[] | null
+          id: string
+          name: string
+          priority_level: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          auto_assignment_enabled?: boolean | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          customer_code: string
+          document_types?: string[] | null
+          id?: string
+          name: string
+          priority_level?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          auto_assignment_enabled?: boolean | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          customer_code?: string
+          document_types?: string[] | null
+          id?: string
+          name?: string
+          priority_level?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       document_locations: {
         Row: {
           assigned_at: string | null

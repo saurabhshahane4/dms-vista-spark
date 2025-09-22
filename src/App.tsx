@@ -12,6 +12,7 @@ import { WarehouseProvider } from "@/contexts/WarehouseContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import DocumentDetail from "./pages/DocumentDetail";
+import CustomerRackAssignment from "./pages/CustomerRackAssignment";
 import NotFound from "./pages/NotFound";
 
 // Debug React availability
@@ -46,7 +47,7 @@ const App = () => {
                       <Toaster />
                       <Sonner />
                       <Routes>
-                        <Route path="/" element={<Index />} />
+                        <Route path="/customer-rack-assignment" element={<CustomerRackAssignment />} />
                         <Route path="/document/:id" element={<DocumentDetail />} />
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                         <Route path="*" element={<NotFound />} />
