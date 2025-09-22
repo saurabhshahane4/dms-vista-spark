@@ -15,10 +15,6 @@ import DocumentDetail from "./pages/DocumentDetail";
 import CustomerRackAssignment from "./pages/CustomerRackAssignment";
 import NotFound from "./pages/NotFound";
 
-// Debug React availability
-console.log('React in App.tsx:', React);
-console.log('React.version:', React.version);
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -28,12 +24,7 @@ const queryClient = new QueryClient({
   },
 });
 
-console.log('QueryClient created:', queryClient);
-
 const App = () => {
-  console.log('App component rendering');
-  console.log('React in App component:', React);
-  
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
@@ -47,6 +38,7 @@ const App = () => {
                       <Toaster />
                       <Sonner />
                       <Routes>
+                        <Route path="/" element={<Index />} />
                         <Route path="/customer-rack-assignment" element={<CustomerRackAssignment />} />
                         <Route path="/document/:id" element={<DocumentDetail />} />
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
