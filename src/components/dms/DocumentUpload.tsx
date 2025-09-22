@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigation } from '@/contexts/NavigationContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -28,6 +29,7 @@ const DocumentUpload = ({ onUploadComplete }: DocumentUploadProps) => {
   const [tags, setTags] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
+  const { setActiveTab } = useNavigation();
   const { toast } = useToast();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,12 +106,23 @@ const DocumentUpload = ({ onUploadComplete }: DocumentUploadProps) => {
     }
   };
 
+  const handleNewDocument = () => {
+    setActiveTab('EnhancedUpload');
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
+      <Button 
+        className="bg-dms-blue hover:bg-dms-blue/90 text-white"
+        onClick={handleNewDocument}
+      >
+        <FileText className="w-4 h-4 mr-2" />
+        New Document
+      </Button>
+      <DialogTrigger asChild style={{ display: 'none' }}>
         <Button className="bg-dms-blue hover:bg-dms-blue/90 text-white">
           <FileText className="w-4 h-4 mr-2" />
-          New Document
+          Hidden Trigger
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md bg-popover">
