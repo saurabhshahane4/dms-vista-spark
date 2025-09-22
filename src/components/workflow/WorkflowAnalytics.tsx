@@ -17,6 +17,22 @@ import {
   Calendar
 } from 'lucide-react';
 import { useWorkflow } from '@/hooks/useWorkflow';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  Area,
+  AreaChart
+} from 'recharts';
 
 export const WorkflowAnalytics = () => {
   const { 
@@ -290,12 +306,39 @@ export const WorkflowAnalytics = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64 flex items-center justify-center text-muted-foreground">
-                <div className="text-center">
-                  <BarChart3 className="h-12 w-12 mx-auto mb-4" />
-                  <p>Volume chart would be rendered here</p>
-                  <p className="text-sm">Integration with charting library needed</p>
-                </div>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={workflowVolumeData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Area 
+                      type="monotone" 
+                      dataKey="uploads" 
+                      stackId="1" 
+                      stroke="hsl(var(--primary))" 
+                      fill="hsl(var(--primary))" 
+                      fillOpacity={0.6}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="approvals" 
+                      stackId="1" 
+                      stroke="hsl(var(--warning))" 
+                      fill="hsl(var(--warning))" 
+                      fillOpacity={0.6}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="completions" 
+                      stackId="1" 
+                      stroke="hsl(var(--success))" 
+                      fill="hsl(var(--success))" 
+                      fillOpacity={0.6}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
@@ -352,19 +395,26 @@ export const WorkflowAnalytics = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">This Week</span>
-                    <span className="text-sm font-medium">{performanceMetrics.avgApprovalTime}h avg</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Last Week</span>
-                    <span className="text-sm font-medium">{(performanceMetrics.avgApprovalTime * 1.12).toFixed(1)}h avg</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Last Month</span>
-                    <span className="text-sm font-medium">{(performanceMetrics.avgApprovalTime * 1.25).toFixed(1)}h avg</span>
-                  </div>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={[
+                      { period: 'Week 1', avgTime: performanceMetrics.avgApprovalTime * 1.25 },
+                      { period: 'Week 2', avgTime: performanceMetrics.avgApprovalTime * 1.12 },
+                      { period: 'Week 3', avgTime: performanceMetrics.avgApprovalTime * 1.05 },
+                      { period: 'Week 4', avgTime: performanceMetrics.avgApprovalTime }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="period" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line 
+                        type="monotone" 
+                        dataKey="avgTime" 
+                        stroke="hsl(var(--primary))" 
+                        strokeWidth={2}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
@@ -377,34 +427,26 @@ export const WorkflowAnalytics = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Contracts</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-20 bg-secondary rounded-full h-2">
-                        <div className="bg-primary h-2 rounded-full" style={{ width: '60%' }} />
-                      </div>
-                      <span className="text-sm">60%</span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Financial</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-20 bg-secondary rounded-full h-2">
-                        <div className="bg-success h-2 rounded-full" style={{ width: '25%' }} />
-                      </div>
-                      <span className="text-sm">25%</span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Legal</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-20 bg-secondary rounded-full h-2">
-                        <div className="bg-warning h-2 rounded-full" style={{ width: '15%' }} />
-                      </div>
-                      <span className="text-sm">15%</span>
-                    </div>
-                  </div>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: 'Contracts', value: 60, fill: 'hsl(var(--primary))' },
+                          { name: 'Financial', value: 25, fill: 'hsl(var(--success))' },
+                          { name: 'Legal', value: 15, fill: 'hsl(var(--warning))' }
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value }) => `${name}: ${value}%`}
+                        outerRadius={60}
+                        fill="#8884d8"
+                        dataKey="value"
+                      />
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>

@@ -32,9 +32,11 @@ import {
   Settings,
   Plus,
   FileText,
-  Filter
+  Filter,
+  TestTube
 } from 'lucide-react';
 import { useWorkflow } from '@/hooks/useWorkflow';
+import { WorkflowExecutionEngine, validateWorkflow, executeWorkflow } from './WorkflowExecutionEngine';
 import { toast } from 'sonner';
 
 // Custom node types
@@ -105,6 +107,7 @@ export const WorkflowBuilder = () => {
   const [workflowName, setWorkflowName] = useState('');
   const [workflowDescription, setWorkflowDescription] = useState('');
   const [selectedComponent, setSelectedComponent] = useState<any>(null);
+  const [isTestMode, setIsTestMode] = useState(false);
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -125,6 +128,72 @@ export const WorkflowBuilder = () => {
     };
     setNodes((nds) => nds.concat(newNode));
   }, [setNodes]);
+
+  const testWorkflow = async () => {
+    if (nodes.length === 0) {
+      toast.error('Please add some nodes to test the workflow');
+      return;
+    }
+
+    const workflowDefinition = {
+      nodes: nodes.map(node => ({
+        id: node.id,
+        type: node.type as 'trigger' | 'condition' | 'action',
+        data: node.data,
+      })),
+      edges: edges.map(edge => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+      })),
+    };
+
+    // Validate workflow
+    const validation = validateWorkflow(workflowDefinition);
+    if (!validation.isValid) {
+      toast.error('Workflow validation failed', {
+        description: validation.errors.join(', ')
+      });
+      return;
+    }
+
+    setIsTestMode(true);
+    
+    try {
+      // Test with sample data
+      const testContext = {
+        customer: 'Customer A',
+        documentType: 'contract',
+        fileSize: 25.5,
+        location: 'Warehouse 1'
+      };
+
+      const triggerNodes = nodes.filter(n => n.type === 'trigger');
+      if (triggerNodes.length > 0) {
+        const result = await executeWorkflow(
+          'test-workflow',
+          workflowDefinition,
+          triggerNodes[0].data.componentId,
+          'test-document-id',
+          'test-user-id',
+          testContext
+        );
+
+        if (result) {
+          toast.success('Workflow test completed successfully!');
+        } else {
+          toast.error('Workflow test failed');
+        }
+      }
+    } catch (error) {
+      console.error('Workflow test error:', error);
+      toast.error('Workflow test failed', {
+        description: error instanceof Error ? error.message : 'Unknown error'
+      });
+    } finally {
+      setIsTestMode(false);
+    }
+  };
 
   const saveWorkflow = async () => {
     if (!workflowName.trim()) {
@@ -195,9 +264,14 @@ export const WorkflowBuilder = () => {
                     <Save className="h-4 w-4" />
                     Save
                   </Button>
-                  <Button variant="outline" className="gap-2" disabled>
-                    <Play className="h-4 w-4" />
-                    Test
+                  <Button 
+                    variant="outline" 
+                    className="gap-2" 
+                    onClick={testWorkflow}
+                    disabled={isTestMode}
+                  >
+                    <TestTube className="h-4 w-4" />
+                    {isTestMode ? 'Testing...' : 'Test'}
                   </Button>
                 </div>
               </CardContent>
