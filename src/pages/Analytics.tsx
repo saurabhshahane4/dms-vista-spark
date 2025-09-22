@@ -158,7 +158,10 @@ const Analytics = () => {
           <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
             <FileText className="w-5 h-5 text-blue-600" />
             <div>
-              <p className="text-lg font-semibold text-foreground">12,847 <Badge className="bg-green-100 text-green-800 ml-2">+15%</Badge></p>
+              <div className="text-lg font-semibold text-foreground flex items-center gap-2">
+                12,847 
+                <Badge className="bg-green-100 text-green-800">+15%</Badge>
+              </div>
               <p className="text-xs text-muted-foreground">Total Documents</p>
             </div>
           </div>
@@ -166,7 +169,10 @@ const Analytics = () => {
           <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
             <Users className="w-5 h-5 text-green-600" />
             <div>
-              <p className="text-lg font-semibold text-foreground">1,234 <Badge className="bg-green-100 text-green-800 ml-2">+8%</Badge></p>
+              <div className="text-lg font-semibold text-foreground flex items-center gap-2">
+                1,234 
+                <Badge className="bg-green-100 text-green-800">+8%</Badge>
+              </div>
               <p className="text-xs text-muted-foreground">Active Users</p>
             </div>
           </div>
@@ -174,7 +180,10 @@ const Analytics = () => {
           <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
             <Clock className="w-5 h-5 text-orange-600" />
             <div>
-              <p className="text-lg font-semibold text-foreground">23 <Badge className="bg-red-100 text-red-800 ml-2">-19%</Badge></p>
+              <div className="text-lg font-semibold text-foreground flex items-center gap-2">
+                23 
+                <Badge className="bg-red-100 text-red-800">-19%</Badge>
+              </div>
               <p className="text-xs text-muted-foreground">Pending Approvals</p>
             </div>
           </div>
@@ -182,7 +191,10 @@ const Analytics = () => {
           <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
             <BarChart3 className="w-5 h-5 text-purple-600" />
             <div>
-              <p className="text-lg font-semibold text-foreground">156 <Badge className="bg-green-100 text-green-800 ml-2">+23%</Badge></p>
+              <div className="text-lg font-semibold text-foreground flex items-center gap-2">
+                156 
+                <Badge className="bg-green-100 text-green-800">+23%</Badge>
+              </div>
               <p className="text-xs text-muted-foreground">Processed Today</p>
             </div>
           </div>
