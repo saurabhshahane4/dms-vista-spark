@@ -11,6 +11,7 @@ import { NavigationProvider } from "@/contexts/NavigationContext";
 import { WarehouseProvider } from "@/contexts/WarehouseContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
+import DocumentDetail from "./pages/DocumentDetail";
 import NotFound from "./pages/NotFound";
 
 // Debug React availability
@@ -46,6 +47,7 @@ const App = () => {
                       <Sonner />
                       <Routes>
                         <Route path="/" element={<Index />} />
+                        <Route path="/document/:id" element={<DocumentDetail />} />
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                         <Route path="*" element={<NotFound />} />
                       </Routes>

@@ -13,7 +13,7 @@ import { useDocuments } from "@/hooks/useDocuments";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { DocumentPreview } from "@/components/dms/DocumentPreview";
+import { useNavigate } from "react-router-dom";
 import { BulkOperationsPanel } from "@/components/dms/BulkOperationsPanel";
 
 // Map icon names to actual icon components
@@ -84,8 +84,7 @@ const Documents = () => {
   
   // Advanced document operations states
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
-  const [previewDocumentId, setPreviewDocumentId] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
+  // Removed preview state - now using navigation
   const [selectionMode, setSelectionMode] = useState(false);
   
   // Folder management states
@@ -357,8 +356,7 @@ const Documents = () => {
       event.preventDefault();
       toggleDocumentSelection(documentId);
     } else {
-      setPreviewDocumentId(documentId);
-      setShowPreview(true);
+      navigate(`/document/${documentId}`);
     }
   };
 
@@ -787,15 +785,7 @@ const Documents = () => {
         )}
       </div>
 
-      {/* Document Preview */}
-      <DocumentPreview
-        documentId={previewDocumentId}
-        isOpen={showPreview}
-        onClose={() => {
-          setShowPreview(false);
-          setPreviewDocumentId(null);
-        }}
-      />
+      {/* Document Preview removed - now using dedicated page */}
 
       {/* Bulk Operations Panel */}
       <BulkOperationsPanel
