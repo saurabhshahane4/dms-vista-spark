@@ -46,9 +46,9 @@ const Header = () => {
           </div>
           <div>
             <h1 className="text-xl font-semibold text-foreground">
-              Document Archiving <span className="text-dms-purple">System</span>
+              {t('documentArchivingSystem')} <span className="text-dms-purple">System</span>
             </h1>
-            <p className="text-sm text-muted-foreground">AI-Powered Document Management</p>
+            <p className="text-sm text-muted-foreground">{t('aiPoweredDms')}</p>
           </div>
         </div>
 
@@ -84,7 +84,7 @@ const Header = () => {
             <UserAvatarDropdown />
           ) : (
             <Button variant="outline" size="sm">
-              Sign In
+              {t('signIn')}
             </Button>
           )}
         </div>

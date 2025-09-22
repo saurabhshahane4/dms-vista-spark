@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Card } from "@/components/ui/card";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface StatsCardProps {
   title: string;
@@ -12,6 +13,8 @@ interface StatsCardProps {
 }
 
 const StatsCard = ({ title, value, change, isPositive, icon, iconBg }: StatsCardProps) => {
+  const { t } = useLanguage();
+  
   return (
     <Card className="p-6 bg-card shadow-soft border border-border/50 hover:shadow-medium transition-shadow">
       <div className="flex items-center justify-between">
@@ -25,7 +28,7 @@ const StatsCard = ({ title, value, change, isPositive, icon, iconBg }: StatsCard
               <TrendingDown className="w-4 h-4 text-destructive" />
             )}
             <span className={`text-sm font-medium ${isPositive ? "text-dms-success" : "text-destructive"}`}>
-              {change} from last month
+              {change} {t('from_last_month')}
             </span>
           </div>
         </div>

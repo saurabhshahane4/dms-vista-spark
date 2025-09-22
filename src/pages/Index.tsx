@@ -18,11 +18,13 @@ import { FileText, Archive, Clock, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDocuments } from "@/hooks/useDocuments";
 import { useNavigation } from "@/contexts/NavigationContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import AuthPage from "@/components/auth/AuthPage";
 const Index = () => {
   const { user, loading } = useAuth();
   const { stats } = useDocuments();
   const { activeTab } = useNavigation();
+  const { t } = useLanguage();
   
   // Check if we should show the intelligent upload page
   if (activeTab === 'IntelligentUpload') {
@@ -94,7 +96,7 @@ const Index = () => {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <StatsCard 
-                title="Total Documents" 
+                title={t('totalDocuments')} 
                 value={stats.totalDocuments.toLocaleString()} 
                 change={getChange(stats.totalDocuments)} 
                 isPositive={Math.random() > 0.5} 
@@ -102,7 +104,7 @@ const Index = () => {
                 iconBg="bg-dms-blue" 
               />
               <StatsCard 
-                title="Physical Files" 
+                title={t('physicalFiles')} 
                 value={stats.physicalFiles.toLocaleString()} 
                 change={getChange(stats.physicalFiles)} 
                 isPositive={Math.random() > 0.5} 
@@ -110,7 +112,7 @@ const Index = () => {
                 iconBg="bg-dms-purple" 
               />
               <StatsCard 
-                title="Pending Approvals" 
+                title={t('pendingApprovals')} 
                 value={stats.pendingApprovals.toString()} 
                 change={getChange(stats.pendingApprovals)} 
                 isPositive={Math.random() > 0.5} 
@@ -118,7 +120,7 @@ const Index = () => {
                 iconBg="bg-dms-orange" 
               />
               <StatsCard 
-                title="Active Users" 
+                title={t('activeUsers')} 
                 value={stats.activeUsers.toString()} 
                 change={getChange(stats.activeUsers)} 
                 isPositive={Math.random() > 0.5} 

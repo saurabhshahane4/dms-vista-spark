@@ -5,10 +5,13 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNavigation } from "@/contexts/NavigationContext";
 
+import { useLanguage } from "@/contexts/LanguageContext";
+
 const QuickActions = () => {
   const [scanModalOpen, setScanModalOpen] = useState(false);
   const [reportsModalOpen, setReportsModalOpen] = useState(false);
   const { setActiveTab } = useNavigation();
+  const { t } = useLanguage();
 
   const handleScan = () => {
     setActiveTab('Scan');
@@ -38,7 +41,7 @@ const QuickActions = () => {
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-foreground">Quick Actions</h3>
+            <h3 className="text-lg font-semibold text-foreground">{t('quickActions')}</h3>
             <p className="text-sm text-muted-foreground">Frequently used operations</p>
           </div>
         </div>
@@ -52,7 +55,7 @@ const QuickActions = () => {
             >
               <Upload className="w-5 h-5 text-white" />
             </Button>
-            <span className="text-sm font-medium text-foreground">Upload</span>
+            <span className="text-sm font-medium text-foreground">{t('upload')}</span>
           </div>
 
           {/* AI Search */}
@@ -63,7 +66,7 @@ const QuickActions = () => {
             >
               <Search className="w-5 h-5 text-white" />
             </Button>
-            <span className="text-sm font-medium text-foreground">AI Search</span>
+            <span className="text-sm font-medium text-foreground">{t('aiSearch')}</span>
           </div>
 
           {/* Scan */}
@@ -74,7 +77,7 @@ const QuickActions = () => {
             >
               <ScanLine className="w-5 h-5 text-white" />
             </Button>
-            <span className="text-sm font-medium text-foreground">Scan</span>
+            <span className="text-sm font-medium text-foreground">{t('scan')}</span>
           </div>
 
           {/* Reports */}
@@ -85,7 +88,7 @@ const QuickActions = () => {
             >
               <BarChart3 className="w-5 h-5 text-white" />
             </Button>
-            <span className="text-sm font-medium text-foreground">Reports</span>
+            <span className="text-sm font-medium text-foreground">{t('reports')}</span>
           </div>
         </div>
       </Card>
