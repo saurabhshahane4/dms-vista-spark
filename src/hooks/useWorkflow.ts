@@ -122,26 +122,55 @@ export const useWorkflow = () => {
     if (!user?.id) return;
 
     try {
-      const { data, error } = await supabase
+      // Fetch approval requests first
+      const { data: approvalData, error: approvalError } = await supabase
         .from('approval_requests')
-        .select(`
-          *,
-          workflow_instances!inner(
-            id,
-            workflow_id,
-            context_data,
-            workflows!inner(
-              id,
-              name,
-              description
-            )
-          )
-        `)
+        .select('*')
         .or(`user_id.eq.${user.id},approver_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setApprovalRequests(data as ApprovalRequest[] || []);
+      if (approvalError) throw approvalError;
+
+      if (!approvalData || approvalData.length === 0) {
+        setApprovalRequests([]);
+        return;
+      }
+
+      // Get unique workflow instance IDs
+      const workflowInstanceIds = [...new Set(approvalData.map(req => req.workflow_instance_id))];
+
+      // Fetch workflow instances and workflows
+      const { data: instanceData, error: instanceError } = await supabase
+        .from('workflow_instances')
+        .select(`
+          id,
+          workflow_id,
+          context_data,
+          workflows!inner(
+            id,
+            name,
+            description
+          )
+        `)
+        .in('id', workflowInstanceIds);
+
+      if (instanceError) throw instanceError;
+
+      // Create a lookup map for workflow instances
+      const instanceMap = new Map();
+      if (instanceData) {
+        instanceData.forEach(instance => {
+          instanceMap.set(instance.id, instance);
+        });
+      }
+
+      // Combine the data
+      const enrichedApprovals = approvalData.map(approval => ({
+        ...approval,
+        workflow_instances: instanceMap.get(approval.workflow_instance_id) || null
+      }));
+
+      setApprovalRequests(enrichedApprovals as ApprovalRequest[]);
     } catch (error) {
       console.error('Error fetching approval requests:', error);
       toast.error('Failed to fetch approval requests');
