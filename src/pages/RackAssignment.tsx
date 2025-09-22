@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Scan, MapPin, FileText, Move, History } from 'lucide-react';
+import { Search, Scan, MapPin, FileText, Move } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -44,7 +44,6 @@ const RackAssignment = () => {
   const [selectedAssignment, setSelectedAssignment] = useState<AssignedDocument | null>(null);
   const [newRack, setNewRack] = useState<any>(null);
   const [assignedDocuments, setAssignedDocuments] = useState<AssignedDocument[]>([]);
-  const [locationHistory, setLocationHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Fetch assigned documents
@@ -259,33 +258,8 @@ const RackAssignment = () => {
     }
   };
 
-  // Fetch location history
-  const fetchLocationHistory = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('location_history')
-        .select(`
-          *,
-          documents(name),
-          from_racks:from_rack_id(code, barcode),
-          to_racks:to_rack_id(code, barcode)
-        `)
-        .eq('user_id', user.id)
-        .order('moved_at', { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-      setLocationHistory(data || []);
-    } catch (error) {
-      console.error('Error fetching location history:', error);
-    }
-  };
-
   useEffect(() => {
     fetchAssignedDocuments();
-    fetchLocationHistory();
   }, [user]);
 
   const handleBarcodeKeyPress = (e: React.KeyboardEvent) => {
@@ -319,10 +293,9 @@ const RackAssignment = () => {
       </div>
 
       <Tabs defaultValue="assign" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="assign">Assign Documents</TabsTrigger>
           <TabsTrigger value="assigned">Assigned Documents</TabsTrigger>
-          <TabsTrigger value="history">Location History</TabsTrigger>
         </TabsList>
 
         <TabsContent value="assign" className="space-y-6">
@@ -475,45 +448,6 @@ const RackAssignment = () => {
                         Re-assign
                       </Button>
                     </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="history">
-          <Card>
-            <div className="p-4 border-b">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <History className="w-5 h-5" />
-                Location History
-              </h3>
-            </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Document</TableHead>
-                  <TableHead>From</TableHead>
-                  <TableHead>To</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Reason</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {locationHistory.map((entry) => (
-                  <TableRow key={entry.id}>
-                    <TableCell className="font-medium">
-                      {entry.documents?.name || 'Unknown Document'}
-                    </TableCell>
-                    <TableCell>
-                      {entry.from_racks?.code || 'New Assignment'}
-                    </TableCell>
-                    <TableCell>
-                      {entry.to_racks?.code || 'Unassigned'}
-                    </TableCell>
-                    <TableCell>{new Date(entry.moved_at).toLocaleDateString()}</TableCell>
-                    <TableCell>{entry.reason || '-'}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
