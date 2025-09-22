@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AISearchBox } from '@/components/search/AISearchBox';
 import { DocumentProcessor } from '@/components/upload/DocumentProcessor';
 import { useDocuments } from '@/hooks/useDocuments';
 
-function Documents() {
+const Documents: React.FC = () => {
   const { documents, loading, refetch } = useDocuments();
 
   if (loading) {
@@ -58,6 +58,6 @@ function Documents() {
       </div>
     </div>
   );
-}
+};
 
 export default Documents;
