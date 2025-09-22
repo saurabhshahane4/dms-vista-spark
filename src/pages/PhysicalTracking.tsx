@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileText, MapPin, Package, Calendar, User, Building2, Archive, Box, BarChart, CheckCircle, ScanLine, Download, History, Users } from 'lucide-react';
+import { FileText, MapPin, Package, Calendar, User, Building2, Archive, Box, BarChart, CheckCircle, ScanLine, Download, History, Users, Plus, Search, Move, Tag, Clock, TrendingUp, Activity, Zap, Star, BookOpen } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -165,6 +165,117 @@ const PhysicalTracking = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6 mt-6">
+          {/* Quick Actions Bar */}
+          <Card className="p-6 border border-border/50">
+            <div className="flex items-center gap-3 mb-4">
+              <Zap className="w-5 h-5 text-primary" />
+              <h3 className="text-lg font-semibold text-foreground">Quick Actions</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Button 
+                variant="outline" 
+                className="h-20 flex-col gap-2 hover:bg-accent/50"
+                onClick={() => setActiveTab('DocumentLookup')}
+              >
+                <Search className="w-6 h-6 text-primary" />
+                <span className="text-sm font-medium">Document Lookup</span>
+              </Button>
+              <Button variant="outline" className="h-20 flex-col gap-2 hover:bg-accent/50">
+                <Plus className="w-6 h-6 text-green-600" />
+                <span className="text-sm font-medium">Add Document</span>
+              </Button>
+              <Button variant="outline" className="h-20 flex-col gap-2 hover:bg-accent/50">
+                <Move className="w-6 h-6 text-blue-600" />
+                <span className="text-sm font-medium">Batch Move</span>
+              </Button>
+              <Button variant="outline" className="h-20 flex-col gap-2 hover:bg-accent/50">
+                <Tag className="w-6 h-6 text-purple-600" />
+                <span className="text-sm font-medium">Tag Documents</span>
+              </Button>
+            </div>
+          </Card>
+
+          {/* Shortcuts & Analytics Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Shortcuts */}
+            <Card className="p-6 border border-border/50">
+              <div className="flex items-center gap-3 mb-4">
+                <Star className="w-5 h-5 text-yellow-500" />
+                <h3 className="text-lg font-semibold text-foreground">Shortcuts</h3>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 rounded-lg border border-border/30 hover:bg-accent/30 cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <BookOpen className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-medium">Recent Searches</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">5 saved</span>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg border border-border/30 hover:bg-accent/30 cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <MapPin className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-medium">Frequently Accessed Locations</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">Zone A-1</span>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg border border-border/30 hover:bg-accent/30 cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <Clock className="w-4 h-4 text-orange-600" />
+                    <span className="text-sm font-medium">Pending Actions</span>
+                  </div>
+                  <Badge className="bg-orange-100 text-orange-800">3</Badge>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg border border-border/30 hover:bg-accent/30 cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <Users className="w-4 h-4 text-purple-600" />
+                    <span className="text-sm font-medium">My Assigned Documents</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">12 docs</span>
+                </div>
+              </div>
+            </Card>
+
+            {/* Analytics */}
+            <Card className="p-6 border border-border/50">
+              <div className="flex items-center gap-3 mb-4">
+                <TrendingUp className="w-5 h-5 text-green-500" />
+                <h3 className="text-lg font-semibold text-foreground">Analytics</h3>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Documents processed today</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-green-600">+15%</span>
+                    <TrendingUp className="w-3 h-3 text-green-600" />
+                  </div>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div className="bg-green-500 h-2 rounded-full" style={{width: '75%'}}></div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Storage utilization</span>
+                  <span className="text-sm font-semibold">83.2%</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '83%'}}></div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Avg. retrieval time</span>
+                  <span className="text-sm font-semibold text-green-600">2.3 min</span>
+                </div>
+                
+                <div className="pt-2 border-t border-border/30">
+                  <Button variant="outline" size="sm" className="w-full">
+                    <Activity className="w-4 h-4 mr-2" />
+                    View Detailed Analytics
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+
           {/* Physical Document Overview */}
           <Card className="p-6 border border-border/50">
             <div className="flex items-center gap-3 mb-4">
