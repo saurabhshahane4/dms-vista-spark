@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Settings, FileTemplate } from 'lucide-react';
+import { ArrowLeft, Settings, FileUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -66,7 +66,7 @@ const IntelligentUpload = () => {
                 Batch Upload {batchMode && '(Active)'}
               </Button>
               <Button variant="outline" size="sm">
-                <FileTemplate className="w-4 h-4 mr-2" />
+                <FileUp className="w-4 h-4 mr-2" />
                 Templates
               </Button>
               <Button variant="outline" size="sm">

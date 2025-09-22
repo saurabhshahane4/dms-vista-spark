@@ -8,7 +8,7 @@ import Documents from "@/pages/Documents";
 import PhysicalTracking from "@/pages/PhysicalTracking";
 import Workflow from "@/pages/Workflow";
 import Analytics from "@/pages/Analytics";
-import EnhancedUpload from "@/pages/EnhancedUpload";
+import IntelligentUpload from "@/pages/IntelligentUpload";
 import Scan from "@/pages/Scan";
 import Settings from "@/pages/Settings";
 import MetadataTypes from "@/pages/MetadataTypes";
@@ -23,9 +23,9 @@ const Index = () => {
   const { stats } = useDocuments();
   const { activeTab } = useNavigation();
   
-  // Check if we should show the enhanced upload page
-  if (activeTab === 'EnhancedUpload') {
-    return <EnhancedUpload />;
+  // Check if we should show the intelligent upload page
+  if (activeTab === 'IntelligentUpload') {
+    return <IntelligentUpload />;
   }
 
   // Check if we should show the scan page

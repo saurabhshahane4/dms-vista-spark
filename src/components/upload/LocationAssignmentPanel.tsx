@@ -121,17 +121,19 @@ const LocationAssignmentPanel = ({
     }
   };
 
-  const handleManualRackSelection = (rackId: string) => {
-    const selectedRack = availableRacks.find(r => r.id === rackId);
-    if (selectedRack) {
-      onAssignmentChange({
-        status: 'manual-selection',
-        assignedRack: selectedRack,
-        reason: 'Manually selected',
-        confidence: 100,
-        estimatedCapacityAfter: selectedRack.current_count + 1
-      });
-      setShowManualSelection(false);
+  const handleManualRackSelection = (selectedRacks: string[]) => {
+    if (selectedRacks.length > 0) {
+      const selectedRack = availableRacks.find(r => r.id === selectedRacks[0]);
+      if (selectedRack) {
+        onAssignmentChange({
+          status: 'manual-selection',
+          assignedRack: selectedRack,
+          reason: 'Manually selected',
+          confidence: 100,
+          estimatedCapacityAfter: selectedRack.current_count + 1
+        });
+        setShowManualSelection(false);
+      }
     }
   };
 
@@ -286,7 +288,7 @@ const LocationAssignmentPanel = ({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleManualRackSelection(rack.id)}
+                         onClick={() => handleManualRackSelection([rack.id])}
                       >
                         Use This
                       </Button>
@@ -337,7 +339,7 @@ const LocationAssignmentPanel = ({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleManualRackSelection(rack.id)}
+                        onClick={() => handleManualRackSelection([rack.id])}
                       >
                         <Target className="w-4 h-4 mr-1" />
                         Select
@@ -399,9 +401,9 @@ const LocationAssignmentPanel = ({
             </div>
             
             <WarehouseTreePicker
+              availableRacks={availableRacks}
+              selectedRacks={[]}
               onRackSelect={handleManualRackSelection}
-              filterAvailable={true}
-              highlightCustomerPreferred={customer?.id}
             />
           </div>
         )}
