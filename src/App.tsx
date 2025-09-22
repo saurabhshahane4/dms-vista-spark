@@ -13,6 +13,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import DocumentDetail from "./pages/DocumentDetail";
 import CustomerRackAssignment from "./pages/CustomerRackAssignment";
+import Workflow from "./pages/Workflow";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -40,6 +41,7 @@ const App = () => {
                       <Routes>
                         <Route path="/" element={<Index />} />
                         <Route path="/customer-rack-assignment" element={<CustomerRackAssignment />} />
+                        <Route path="/workflow" element={<Workflow />} />
                         <Route path="/document/:id" element={<DocumentDetail />} />
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                         <Route path="*" element={<NotFound />} />

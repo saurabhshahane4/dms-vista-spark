@@ -14,6 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
+      approval_matrix: {
+        Row: {
+          approvers: Json
+          conditions: Json
+          created_at: string
+          escalation_policy: Json | null
+          id: string
+          is_active: boolean | null
+          name: string
+          priority_order: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approvers?: Json
+          conditions?: Json
+          created_at?: string
+          escalation_policy?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          priority_order?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approvers?: Json
+          conditions?: Json
+          created_at?: string
+          escalation_policy?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          priority_order?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      approval_requests: {
+        Row: {
+          approval_level: number
+          approved_at: string | null
+          approver_id: string
+          comments: string | null
+          created_at: string
+          document_id: string | null
+          due_date: string | null
+          id: string
+          priority: string | null
+          rejected_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          workflow_instance_id: string
+        }
+        Insert: {
+          approval_level?: number
+          approved_at?: string | null
+          approver_id: string
+          comments?: string | null
+          created_at?: string
+          document_id?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string | null
+          rejected_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          workflow_instance_id: string
+        }
+        Update: {
+          approval_level?: number
+          approved_at?: string | null
+          approver_id?: string
+          comments?: string | null
+          created_at?: string
+          document_id?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string | null
+          rejected_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          workflow_instance_id?: string
+        }
+        Relationships: []
+      }
       assignment_rules: {
         Row: {
           capacity_threshold: number | null
@@ -594,6 +684,42 @@ export type Database = {
           },
         ]
       }
+      routing_rules: {
+        Row: {
+          actions: Json
+          conditions: Json
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          priority_order: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actions?: Json
+          conditions?: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          priority_order?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actions?: Json
+          conditions?: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          priority_order?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       shelves: {
         Row: {
           code: string
@@ -773,6 +899,114 @@ export type Database = {
           phone?: string | null
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      workflow_audit_log: {
+        Row: {
+          action: string
+          details: Json | null
+          id: string
+          timestamp: string
+          user_id: string
+          workflow_instance_id: string | null
+        }
+        Insert: {
+          action: string
+          details?: Json | null
+          id?: string
+          timestamp?: string
+          user_id: string
+          workflow_instance_id?: string | null
+        }
+        Update: {
+          action?: string
+          details?: Json | null
+          id?: string
+          timestamp?: string
+          user_id?: string
+          workflow_instance_id?: string | null
+        }
+        Relationships: []
+      }
+      workflow_instances: {
+        Row: {
+          completed_at: string | null
+          context_data: Json | null
+          created_at: string
+          current_step: string | null
+          document_id: string | null
+          id: string
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+          workflow_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          context_data?: Json | null
+          created_at?: string
+          current_step?: string | null
+          document_id?: string | null
+          id?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          workflow_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          context_data?: Json | null
+          created_at?: string
+          current_step?: string | null
+          document_id?: string | null
+          id?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          workflow_id?: string
+        }
+        Relationships: []
+      }
+      workflows: {
+        Row: {
+          created_at: string
+          definition: Json
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          status: string
+          updated_at: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          definition?: Json
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          definition?: Json
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          version?: number
         }
         Relationships: []
       }
