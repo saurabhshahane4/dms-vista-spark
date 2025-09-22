@@ -474,15 +474,16 @@ export const useWorkflow = () => {
 
       // Create sample approval requests if none exist
       if (!existingRequests || existingRequests.length === 0) {
-        // Create a placeholder approver user for demo purposes
-        const demoApproverId = user.id;
+        // Create a demo UUID for other users to make realistic approval scenarios
+        const demoRequesterUuid = '00000000-0000-0000-0000-000000000001';
+        const demoApproverUuid = '00000000-0000-0000-0000-000000000002';
 
         const { error: approvalError } = await supabase
           .from('approval_requests')
           .insert([
             // Pending approvals (where current user is the approver)
             {
-              user_id: demoApproverId,
+              user_id: demoRequesterUuid,
               approver_id: user.id,
               workflow_instance_id: instances[0].id,
               approval_level: 1,
@@ -492,7 +493,7 @@ export const useWorkflow = () => {
               comments: 'Please review this annual budget report and provide approval by end of week.'
             },
             {
-              user_id: demoApproverId,
+              user_id: demoRequesterUuid,
               approver_id: user.id,
               workflow_instance_id: instances[Math.min(1, instances.length - 1)].id,
               approval_level: 1,
@@ -501,10 +502,20 @@ export const useWorkflow = () => {
               due_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
               comments: 'Marketing strategy requires your approval before implementation.'
             },
+            {
+              user_id: demoRequesterUuid,
+              approver_id: user.id,
+              workflow_instance_id: instances[Math.min(2, instances.length - 1)].id,
+              approval_level: 1,
+              status: 'pending',
+              priority: 'low',
+              due_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+              comments: 'Document classification update needs your review and approval.'
+            },
             // My requests (where current user is the requester)
             {
               user_id: user.id,
-              approver_id: demoApproverId,
+              approver_id: demoApproverUuid,
               workflow_instance_id: instances[Math.min(2, instances.length - 1)].id,
               approval_level: 1,
               status: 'pending',
@@ -514,7 +525,7 @@ export const useWorkflow = () => {
             },
             {
               user_id: user.id,
-              approver_id: demoApproverId,
+              approver_id: demoApproverUuid,
               workflow_instance_id: instances[Math.min(1, instances.length - 1)].id,
               approval_level: 1,
               status: 'approved',
