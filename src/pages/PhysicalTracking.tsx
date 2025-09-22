@@ -302,6 +302,9 @@ const PhysicalTracking = () => {
         </TabsContent>
 
         <TabsContent value="locations" className="space-y-6 mt-6">
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-foreground">Storage Location</h3>
+          </div>
           <Tabs value={storageSubTab} onValueChange={setStorageSubTab} className="w-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="locations" className="flex items-center gap-2">
