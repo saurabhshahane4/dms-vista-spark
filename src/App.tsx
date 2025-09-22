@@ -10,6 +10,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { NavigationProvider } from "@/contexts/NavigationContext";
 import { WarehouseProvider } from "@/contexts/WarehouseContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { DocumentWorkflowTriggers } from "@/components/workflow/DocumentWorkflowTriggers";
 import Index from "./pages/Index";
 import DocumentDetail from "./pages/DocumentDetail";
 import CustomerRackAssignment from "./pages/CustomerRackAssignment";
@@ -36,6 +37,7 @@ const App = () => {
                 <NavigationProvider>
                   <WarehouseProvider>
                     <TooltipProvider>
+                      <DocumentWorkflowTriggers />
                       <Toaster />
                       <Sonner />
                       <Routes>

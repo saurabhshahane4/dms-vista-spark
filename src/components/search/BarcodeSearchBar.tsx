@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import CameraBarcodeScanner from '@/components/barcode/CameraBarcodeScanner';
+import { useAdvancedSearch } from '@/hooks/useAdvancedSearch';
 
 interface BarcodeSearchBarProps {
   onBarcodeSearch: (barcode: string) => void;
@@ -14,8 +16,10 @@ const BarcodeSearchBar = ({ onBarcodeSearch, placeholder = "Scan or enter barcod
   const [barcodeValue, setBarcodeValue] = useState('');
   const [isScanning, setIsScanning] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showCameraScanner, setShowCameraScanner] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { searchByBarcode } = useAdvancedSearch();
 
   const handleManualInput = (value: string) => {
     setBarcodeValue(value);
@@ -25,19 +29,17 @@ const BarcodeSearchBar = ({ onBarcodeSearch, placeholder = "Scan or enter barcod
   };
 
   const handleCameraScan = () => {
-    setIsScanning(true);
-    // Mock camera scanning - in real implementation, integrate with barcode scanning library
-    setTimeout(() => {
-      const mockBarcode = `BC-${Date.now()}`;
-      setBarcodeValue(mockBarcode);
-      onBarcodeSearch(mockBarcode);
-      setIsScanning(false);
-      setShowDropdown(false);
-      toast({
-        title: "Barcode Scanned",
-        description: `Successfully scanned: ${mockBarcode}`,
-      });
-    }, 2000);
+    setShowDropdown(false);
+    setShowCameraScanner(true);
+  };
+
+  const handleBarcodeDetected = async (barcode: string) => {
+    setBarcodeValue(barcode);
+    onBarcodeSearch(barcode);
+    setShowCameraScanner(false);
+    
+    // Also perform search with the detected barcode
+    await searchByBarcode(barcode);
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,6 +156,13 @@ const BarcodeSearchBar = ({ onBarcodeSearch, placeholder = "Scan or enter barcod
           onClick={() => setShowDropdown(false)}
         />
       )}
+
+      {/* Camera Scanner Modal */}
+      <CameraBarcodeScanner
+        isOpen={showCameraScanner}
+        onBarcodeDetected={handleBarcodeDetected}
+        onClose={() => setShowCameraScanner(false)}
+      />
     </div>
   );
 };

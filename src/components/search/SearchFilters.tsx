@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Filter, X, Calendar, Building, FileType, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useAdvancedSearch } from '@/hooks/useAdvancedSearch';
 
 interface SearchFiltersProps {
   activeFilters: Record<string, any>;
@@ -15,6 +16,7 @@ interface SearchFiltersProps {
 
 const SearchFilters = ({ activeFilters, onFiltersChange }: SearchFiltersProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const { performAdvancedSearch, isSearching } = useAdvancedSearch();
 
   const updateFilter = (key: string, value: any) => {
     const newFilters = { ...activeFilters };
@@ -29,6 +31,24 @@ const SearchFilters = ({ activeFilters, onFiltersChange }: SearchFiltersProps) =
   const clearAllFilters = () => {
     onFiltersChange({});
   };
+
+  const applyFilters = async () => {
+    if (Object.keys(activeFilters).length > 0) {
+      await performAdvancedSearch(activeFilters);
+    }
+    setShowAdvanced(false);
+  };
+
+  // Auto-apply filters when they change (with debounce)
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (Object.keys(activeFilters).length > 0) {
+        performAdvancedSearch(activeFilters);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [activeFilters, performAdvancedSearch]);
 
   const activeFilterCount = Object.keys(activeFilters).length;
 
@@ -306,8 +326,11 @@ const SearchFilters = ({ activeFilters, onFiltersChange }: SearchFiltersProps) =
                 <Button variant="outline" onClick={clearAllFilters}>
                   Clear All
                 </Button>
-                <Button onClick={() => setShowAdvanced(false)}>
-                  Apply Filters
+                <Button 
+                  onClick={applyFilters} 
+                  disabled={isSearching}
+                >
+                  {isSearching ? 'Searching...' : 'Apply Filters'}
                 </Button>
               </div>
             </div>
