@@ -49,7 +49,7 @@ const FileUploadZone = ({ files, onFilesChange, batchMode, validationResults }: 
     const processedFiles: FileWithValidation[] = newFiles.map(file => ({
       ...file,
       id: `${file.name}-${Date.now()}-${Math.random()}`,
-      preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
+      preview: (file.type && file.type.startsWith('image/')) ? URL.createObjectURL(file) : undefined,
       validation: validateFile(file),
       uploadProgress: 0
     }));
@@ -82,13 +82,13 @@ const FileUploadZone = ({ files, onFilesChange, batchMode, validationResults }: 
       'text/plain'
     ];
 
-    if (!allowedTypes.includes(file.type)) {
+    if (!file.type || !allowedTypes.includes(file.type)) {
       messages.push('Unsupported file type');
       status = 'error';
     }
 
     // OCR readiness check
-    if (file.type.startsWith('image/') && file.size < 50 * 1024) {
+    if (file.type && file.type.startsWith('image/') && file.size < 50 * 1024) {
       messages.push('Image may be too small for reliable OCR');
       status = 'warning';
     }
@@ -102,7 +102,7 @@ const FileUploadZone = ({ files, onFilesChange, batchMode, validationResults }: 
   };
 
   const getFileIcon = (file: FileWithValidation) => {
-    if (file.type.startsWith('image/')) {
+    if (file.type && file.type.startsWith('image/')) {
       return <Image className="w-5 h-5 text-blue-500" />;
     } else if (file.type === 'application/pdf') {
       return <FileText className="w-5 h-5 text-red-500" />;

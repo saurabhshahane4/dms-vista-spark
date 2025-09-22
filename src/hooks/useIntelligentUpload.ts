@@ -165,7 +165,7 @@ export const useIntelligentUpload = () => {
 
     // Simulate OCR processing for images
     if (files.length > 0) {
-      const imageFiles = files.filter(f => f.type.startsWith('image/'));
+      const imageFiles = files.filter(f => f.type && f.type.startsWith('image/'));
       if (imageFiles.length > 0) {
         // Mock OCR suggestions
         setTimeout(() => {
