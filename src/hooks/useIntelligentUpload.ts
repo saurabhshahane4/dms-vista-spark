@@ -311,7 +311,7 @@ export const useIntelligentUpload = () => {
       // Process each file
       for (const file of uploadState.files) {
         // Upload file to Supabase Storage
-        const fileExtension = file.name.split('.').pop();
+        const fileExtension = file.name ? file.name.split('.').pop() || 'bin' : 'bin';
         const fileName = `${user.id}/${Date.now()}-${Math.random()}.${fileExtension}`;
         
         const { data: uploadData, error: uploadError } = await supabase.storage
@@ -325,7 +325,7 @@ export const useIntelligentUpload = () => {
         // Create document record
         const documentData = {
           user_id: user.id,
-          name: uploadState.metadata.title || file.name,
+          name: uploadState.metadata.title || file.name || 'Untitled Document',
           file_path: uploadData.path,
           file_size: file.size,
           mime_type: file.type,
