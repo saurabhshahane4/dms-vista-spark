@@ -122,8 +122,6 @@ const Index = () => {
 
         {activeTab === 'Physical Tracking' && <PhysicalTracking />}
 
-        {activeTab === 'Warehouse' && <WarehouseModule />}
-
         {activeTab === 'Workflow' && <Workflow />}
 
         {activeTab === 'Analytics' && <Analytics />}

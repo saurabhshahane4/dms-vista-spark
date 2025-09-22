@@ -1,9 +1,14 @@
-import { useState } from "react";
-import { Archive, CheckCircle, User, Package, ScanLine, Download, FileText } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from 'react';
+import { FileText, MapPin, Package, Calendar, User, Building2, Archive, Box, BarChart, CheckCircle, ScanLine, Download } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useWarehouseNavigation } from '@/contexts/WarehouseContext';
+import WarehouseModule from '@/components/warehouse/WarehouseModule';
 
 const physicalStats = {
   totalFiles: 8234,
@@ -131,10 +136,22 @@ const PhysicalTracking = () => {
       {/* Sub Navigation */}
       <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="tracking">Document Tracking</TabsTrigger>
-          <TabsTrigger value="locations">Storage Locations</TabsTrigger>
-          <TabsTrigger value="inventory">Inventory</TabsTrigger>
+          <TabsTrigger value="overview" className="flex items-center gap-2">
+            <Package className="w-4 h-4" />
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="tracking" className="flex items-center gap-2">
+            <MapPin className="w-4 h-4" />
+            Document Tracking
+          </TabsTrigger>
+          <TabsTrigger value="locations" className="flex items-center gap-2">
+            <Building2 className="w-4 h-4" />
+            Storage Locations
+          </TabsTrigger>
+          <TabsTrigger value="inventory" className="flex items-center gap-2">
+            <BarChart className="w-4 h-4" />
+            Inventory
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6 mt-6">
@@ -277,11 +294,7 @@ const PhysicalTracking = () => {
         </TabsContent>
 
         <TabsContent value="locations" className="space-y-6 mt-6">
-          <div className="text-center py-12">
-            <Archive className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-foreground mb-2">Storage Locations</h3>
-            <p className="text-muted-foreground">Manage and organize physical storage locations and shelving.</p>
-          </div>
+          <WarehouseModule />
         </TabsContent>
 
         <TabsContent value="inventory" className="space-y-6 mt-6">
