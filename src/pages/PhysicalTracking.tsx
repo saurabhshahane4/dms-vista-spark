@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileText, MapPin, Package, Calendar, User, Building2, Archive, Box, BarChart, CheckCircle, ScanLine, Download } from 'lucide-react';
+import { FileText, MapPin, Package, Calendar, User, Building2, Archive, Box, BarChart, CheckCircle, ScanLine, Download, History } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useWarehouseNavigation } from '@/contexts/WarehouseContext';
 import WarehouseModule from '@/components/warehouse/WarehouseModule';
+import LocationHistory from '@/components/warehouse/LocationHistory';
 
 const physicalStats = {
   totalFiles: 8234,
@@ -135,7 +136,7 @@ const PhysicalTracking = () => {
 
       {/* Sub Navigation */}
       <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <Package className="w-4 h-4" />
             Overview
@@ -147,6 +148,10 @@ const PhysicalTracking = () => {
           <TabsTrigger value="locations" className="flex items-center gap-2">
             <Building2 className="w-4 h-4" />
             Storage Locations
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <History className="w-4 h-4" />
+            Location History
           </TabsTrigger>
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <BarChart className="w-4 h-4" />
@@ -295,6 +300,10 @@ const PhysicalTracking = () => {
 
         <TabsContent value="locations" className="space-y-6 mt-6">
           <WarehouseModule />
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-6 mt-6">
+          <LocationHistory />
         </TabsContent>
 
         <TabsContent value="inventory" className="space-y-6 mt-6">

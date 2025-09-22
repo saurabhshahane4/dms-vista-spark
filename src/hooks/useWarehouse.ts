@@ -618,14 +618,97 @@ export const useWarehouse = () => {
     }
   }, [user, fetchRacks]);
 
+  // Fetch location history
+  const fetchLocationHistory = useCallback(async (documentId?: string) => {
+    if (!user) return;
+
+    try {
+      let query = supabase
+        .from('location_history')
+        .select(`
+          *,
+          documents(name),
+          from_racks:from_rack_id(code, barcode, name),
+          to_racks:to_rack_id(code, barcode, name)
+        `)
+        .eq('user_id', user.id);
+
+      if (documentId) {
+        query = query.eq('document_id', documentId);
+      }
+
+      const { data, error } = await query
+        .order('moved_at', { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+      setLocationHistory(data || []);
+    } catch (error) {
+      console.error('Error fetching location history:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch location history",
+        variant: "destructive",
+      });
+    }
+  }, [user]);
+
+  // Create location history entry
+  const createLocationHistory = useCallback(async (
+    documentId: string, 
+    fromRackId: string | null, 
+    toRackId: string | null, 
+    reason?: string, 
+    notes?: string
+  ) => {
+    if (!user) return null;
+
+    try {
+      const { data, error } = await supabase
+        .from('location_history')
+        .insert({
+          user_id: user.id,
+          document_id: documentId,
+          from_rack_id: fromRackId,
+          to_rack_id: toRackId,
+          moved_by: user.id,
+          reason,
+          notes,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      await fetchLocationHistory();
+      return data;
+    } catch (error) {
+      console.error('Error creating location history:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create location history entry",
+        variant: "destructive",
+      });
+      return null;
+    }
+  }, [user, fetchLocationHistory]);
+
   // Document location management
   const assignDocumentToRack = useCallback(async (documentId: string, rackId: string, notes?: string) => {
     if (!user) return null;
 
     try {
+      // Check if document is already assigned somewhere
+      const { data: existingLocation } = await supabase
+        .from('document_locations')
+        .select('rack_id')
+        .eq('document_id', documentId)
+        .eq('user_id', user.id)
+        .single();
+
       const { data, error } = await supabase
         .from('document_locations')
-        .insert({
+        .upsert({
           user_id: user.id,
           document_id: documentId,
           rack_id: rackId,
@@ -636,6 +719,15 @@ export const useWarehouse = () => {
         .single();
 
       if (error) throw error;
+
+      // Create location history entry
+      await createLocationHistory(
+        documentId,
+        existingLocation?.rack_id || null,
+        rackId,
+        existingLocation ? 'moved' : 'assigned',
+        notes
+      );
 
       toast({
         title: "Success",
@@ -652,6 +744,76 @@ export const useWarehouse = () => {
       });
       return null;
     }
+  }, [user, createLocationHistory]);
+
+  // Move document between racks
+  const moveDocumentToRack = useCallback(async (documentId: string, fromRackId: string, toRackId: string, reason?: string, notes?: string) => {
+    if (!user) return null;
+
+    try {
+      const { data, error } = await supabase
+        .from('document_locations')
+        .update({
+          rack_id: toRackId,
+          notes,
+        })
+        .eq('document_id', documentId)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Create location history entry
+      await createLocationHistory(documentId, fromRackId, toRackId, reason, notes);
+
+      toast({
+        title: "Success",
+        description: "Document moved successfully",
+      });
+
+      return data;
+    } catch (error) {
+      console.error('Error moving document:', error);
+      toast({
+        title: "Error",
+        description: "Failed to move document",
+        variant: "destructive",
+      });
+      return null;
+    }
+  }, [user, createLocationHistory]);
+
+  // Fetch document locations
+  const fetchDocumentLocations = useCallback(async (rackId?: string) => {
+    if (!user) return;
+
+    try {
+      let query = supabase
+        .from('document_locations')
+        .select(`
+          *,
+          documents(name, file_path),
+          racks(code, barcode, name)
+        `)
+        .eq('user_id', user.id);
+
+      if (rackId) {
+        query = query.eq('rack_id', rackId);
+      }
+
+      const { data, error } = await query.order('assigned_at', { ascending: false });
+
+      if (error) throw error;
+      setDocumentLocations(data || []);
+    } catch (error) {
+      console.error('Error fetching document locations:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch document locations",
+        variant: "destructive",
+      });
+    }
   }, [user]);
 
   // Initialize data
@@ -663,9 +825,11 @@ export const useWarehouse = () => {
         fetchZones(),
         fetchShelves(),
         fetchRacks(),
+        fetchDocumentLocations(),
+        fetchLocationHistory(),
       ]).finally(() => setLoading(false));
     }
-  }, [user, fetchWarehouses, fetchZones, fetchShelves, fetchRacks]);
+  }, [user, fetchWarehouses, fetchZones, fetchShelves, fetchRacks, fetchDocumentLocations, fetchLocationHistory]);
 
   return {
     // Data
@@ -682,6 +846,8 @@ export const useWarehouse = () => {
     fetchZones,
     fetchShelves,
     fetchRacks,
+    fetchDocumentLocations,
+    fetchLocationHistory,
     getWarehouseHierarchy,
     
     // CRUD operations
@@ -700,5 +866,7 @@ export const useWarehouse = () => {
     
     // Document location management
     assignDocumentToRack,
+    moveDocumentToRack,
+    createLocationHistory,
   };
 };
