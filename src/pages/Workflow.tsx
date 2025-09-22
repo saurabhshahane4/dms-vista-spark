@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Search, Filter, Play, Pause, Settings, BarChart3, CheckCircle, XCircle, Clock, AlertCircle } from 'lucide-react';
+import { Plus, Search, Filter, Play, Pause, Settings, BarChart3, CheckCircle, XCircle, Clock, AlertCircle, Zap } from 'lucide-react';
 import { useWorkflow } from '@/hooks/useWorkflow';
 import { WorkflowBuilder } from '@/components/workflow/WorkflowBuilder';
 import { ApprovalDashboard } from '@/components/workflow/ApprovalDashboard';
@@ -13,6 +13,7 @@ import { ApprovalMatrix } from '@/components/workflow/ApprovalMatrix';
 import { RoutingRules } from '@/components/workflow/RoutingRules';
 import { WorkflowAnalytics } from '@/components/workflow/WorkflowAnalytics';
 import { NotificationSystem } from '@/components/workflow/NotificationSystem';
+import { DocumentWorkflowTrigger } from '@/components/workflow/DocumentWorkflowTrigger';
 
 const Workflow = () => {
   const {
@@ -150,8 +151,12 @@ const Workflow = () => {
 
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="workflows">Workflows</TabsTrigger>
+          <TabsTrigger value="triggers">
+            <Zap className="h-4 w-4 mr-2" />
+            Triggers
+          </TabsTrigger>
           <TabsTrigger value="approvals">My Approvals</TabsTrigger>
           <TabsTrigger value="matrix">Approval Matrix</TabsTrigger>
           <TabsTrigger value="routing">Routing Rules</TabsTrigger>
@@ -252,6 +257,10 @@ const Workflow = () => {
               ))
             )}
           </div>
+        </TabsContent>
+
+        <TabsContent value="triggers">
+          <DocumentWorkflowTrigger />
         </TabsContent>
 
         <TabsContent value="approvals">
