@@ -29,6 +29,7 @@ export const ApprovalDashboard = () => {
     myRequests, 
     approveRequest, 
     rejectRequest,
+    createSampleData,
     loading 
   } = useWorkflow();
   
@@ -159,11 +160,20 @@ export const ApprovalDashboard = () => {
                 <CardContent className="p-8 text-center">
                   <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-foreground mb-2">No pending approvals</h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground mb-4">
                     {searchQuery || priorityFilter !== 'all' 
                       ? 'No approvals match your current filters' 
                       : 'All caught up! No approvals waiting for your action.'}
                   </p>
+                  {(!searchQuery && priorityFilter === 'all') && (
+                    <Button 
+                      variant="outline" 
+                      onClick={createSampleData}
+                      disabled={loading}
+                    >
+                      Create Sample Data
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ) : (
@@ -318,9 +328,16 @@ export const ApprovalDashboard = () => {
                 <CardContent className="p-8 text-center">
                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-foreground mb-2">No requests found</h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground mb-4">
                     You haven't submitted any approval requests yet.
                   </p>
+                  <Button 
+                    variant="outline" 
+                    onClick={createSampleData}
+                    disabled={loading}
+                  >
+                    Create Sample Data
+                  </Button>
                 </CardContent>
               </Card>
             ) : (

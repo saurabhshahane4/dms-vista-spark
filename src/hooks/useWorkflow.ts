@@ -360,6 +360,142 @@ export const useWorkflow = () => {
     }
   };
 
+  // Create sample data for demonstration
+  const createSampleData = async () => {
+    if (!user?.id) return;
+    
+    try {
+      setLoading(true);
+      
+      // Create sample workflows
+      const { data: workflows, error: workflowError } = await supabase
+        .from('workflows')
+        .insert([
+          {
+            name: 'Document Review Workflow',
+            description: 'Standard document approval process',
+            user_id: user.id,
+            definition: { steps: ['review', 'approve', 'archive'] },
+            is_active: true,
+            status: 'active'
+          },
+          {
+            name: 'Budget Approval Workflow', 
+            description: 'Financial document approval process',
+            user_id: user.id,
+            definition: { steps: ['initial_review', 'manager_approval', 'final_approval'] },
+            is_active: true,
+            status: 'active'
+          }
+        ])
+        .select();
+
+      if (workflowError) throw workflowError;
+
+      if (workflows && workflows.length > 0) {
+        // Create sample workflow instances
+        const { data: instances, error: instanceError } = await supabase
+          .from('workflow_instances')
+          .insert([
+            {
+              workflow_id: workflows[0].id,
+              user_id: user.id,
+              status: 'running',
+              context_data: { document_name: 'Annual Budget Report 2024', priority: 'high' },
+              current_step: 'approval_pending'
+            },
+            {
+              workflow_id: workflows[1].id,
+              user_id: user.id,
+              status: 'running',
+              context_data: { document_name: 'Marketing Strategy Document', priority: 'medium' },
+              current_step: 'approval_pending'
+            },
+            {
+              workflow_id: workflows[0].id,
+              user_id: user.id,
+              status: 'running',
+              context_data: { document_name: 'Employee Handbook Update', type: 'policy_document' },
+              current_step: 'waiting_approval'
+            }
+          ])
+          .select();
+
+        if (instanceError) throw instanceError;
+
+        if (instances && instances.length > 0) {
+          // Create sample approval requests
+          const { error: approvalError } = await supabase
+            .from('approval_requests')
+            .insert([
+              // Pending approvals (where current user is the approver)
+              {
+                user_id: '00000000-0000-0000-0000-000000000002',
+                approver_id: user.id,
+                workflow_instance_id: instances[0].id,
+                approval_level: 1,
+                status: 'pending',
+                priority: 'high',
+                due_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+                comments: 'Please review this annual budget report and provide approval by end of week.'
+              },
+              {
+                user_id: '00000000-0000-0000-0000-000000000002',
+                approver_id: user.id,
+                workflow_instance_id: instances[1].id,
+                approval_level: 1,
+                status: 'pending',
+                priority: 'medium',
+                due_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                comments: 'Marketing strategy requires your approval before implementation.'
+              },
+              // My requests (where current user is the requester)
+              {
+                user_id: user.id,
+                approver_id: '00000000-0000-0000-0000-000000000002',
+                workflow_instance_id: instances[2].id,
+                approval_level: 1,
+                status: 'pending',
+                priority: 'medium',
+                due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                comments: 'Submitted employee handbook updates for management review.'
+              },
+              {
+                user_id: user.id,
+                approver_id: '00000000-0000-0000-0000-000000000002',
+                workflow_instance_id: instances[1].id,
+                approval_level: 1,
+                status: 'approved',
+                priority: 'low',
+                due_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                comments: 'Quarterly report was approved and processed successfully.',
+                approved_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+              }
+            ]);
+
+          if (approvalError) throw approvalError;
+        }
+      }
+
+      // Refetch all data after creating samples
+      await Promise.all([
+        fetchWorkflows(),
+        fetchWorkflowInstances(),
+        fetchApprovalRequests(),
+        fetchApprovalMatrix(),
+        fetchRoutingRules()
+      ]);
+      
+      toast.success('Sample data created successfully!');
+      
+    } catch (error) {
+      console.error('Error creating sample data:', error);
+      toast.error('Failed to create sample data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Initialize data
   useEffect(() => {
     if (user?.id) {
@@ -413,6 +549,7 @@ export const useWorkflow = () => {
     rejectRequest,
     createApprovalMatrix,
     createRoutingRule,
+    createSampleData,
 
     // Refresh functions
     refetch: () => Promise.all([
