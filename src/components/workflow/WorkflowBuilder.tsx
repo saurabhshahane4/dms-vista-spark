@@ -120,10 +120,10 @@ export const WorkflowBuilder = () => {
       type,
       position: { x: Math.random() * 300, y: Math.random() * 300 },
       data: {
+        componentId: component.id,
         label: component.label,
         icon: component.icon,
         description: component.description,
-        componentId: component.id,
       },
     };
     setNodes((nds) => nds.concat(newNode));
@@ -139,7 +139,11 @@ export const WorkflowBuilder = () => {
       nodes: nodes.map(node => ({
         id: node.id,
         type: node.type as 'trigger' | 'condition' | 'action',
-        data: node.data,
+        data: {
+          componentId: String(node.data.componentId || ''),
+          label: String(node.data.label || ''),
+          config: node.data.config || {},
+        },
       })),
       edges: edges.map(edge => ({
         id: edge.id,
@@ -173,7 +177,7 @@ export const WorkflowBuilder = () => {
         const result = await executeWorkflow(
           'test-workflow',
           workflowDefinition,
-          triggerNodes[0].data.componentId,
+          String(triggerNodes[0].data.componentId || ''),
           'test-document-id',
           'test-user-id',
           testContext
