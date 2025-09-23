@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FileText, Eye, Download, Loader } from 'lucide-react';
 import { toast } from 'sonner';
+import { DocumentPreview } from '@/components/dms/DocumentPreview';
 
 interface DocumentProcessorProps {
   document: {
@@ -18,7 +19,8 @@ interface DocumentProcessorProps {
 }
 
 export const DocumentProcessor: React.FC<DocumentProcessorProps> = ({ document, onUpdate }) => {
-  const [isProcessing, setIsProcessing] = React.useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const processDocument = useCallback(async () => {
     if (!document.id) return;
@@ -89,18 +91,28 @@ export const DocumentProcessor: React.FC<DocumentProcessorProps> = ({ document, 
         </div>
       </div>
       <div className="flex items-center gap-1">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setShowPreview(true)}
+          className="h-8 px-2"
+          title="Preview Document"
+        >
+          <Eye className="h-3 w-3" />
+        </Button>
         {document.extraction_status !== 'completed' && (
           <Button
             size="sm"
-            variant="outline"
+            variant="secondary"
             onClick={processDocument}
             disabled={isProcessing}
             className="h-8 px-2"
+            title="Process Document"
           >
             {isProcessing ? (
               <Loader className="h-3 w-3 animate-spin" />
             ) : (
-              <Eye className="h-3 w-3" />
+              <FileText className="h-3 w-3" />
             )}
           </Button>
         )}
@@ -118,11 +130,20 @@ export const DocumentProcessor: React.FC<DocumentProcessorProps> = ({ document, 
               URL.revokeObjectURL(url);
             }}
             className="h-8 px-2"
+            title="Download Extracted Text"
           >
             <Download className="h-3 w-3" />
           </Button>
         )}
       </div>
+      
+      {showPreview && (
+        <DocumentPreview
+          documentId={document.id}
+          isOpen={showPreview}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </div>
   );
 };
