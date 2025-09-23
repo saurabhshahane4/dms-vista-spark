@@ -161,7 +161,7 @@ const translations = {
     archiveError: 'Failed to archive documents. Please try again.',
     
     // Barcode Actions
-    createBarcodeName: 'Create Barcode Name'
+    createBarcode: 'Create Barcode'
   },
   ar: {
     // Header & Navigation  
@@ -314,7 +314,7 @@ const translations = {
     archiveError: 'فشل في أرشفة المستندات. يرجى المحاولة مرة أخرى.',
     
     // Barcode Actions
-    createBarcodeName: 'إنشاء اسم الباركود'
+    createBarcode: 'إنشاء باركود'
   }
 };
 
