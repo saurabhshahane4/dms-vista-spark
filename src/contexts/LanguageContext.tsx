@@ -158,7 +158,10 @@ const translations = {
     operationSuccessful: 'Operation completed successfully',
     operationFailed: 'Operation failed. Please try again.',
     documentArchived: 'Active documents have been archived successfully',
-    archiveError: 'Failed to archive documents. Please try again.'
+    archiveError: 'Failed to archive documents. Please try again.',
+    
+    // Barcode Actions
+    createBarcodeName: 'Create Barcode Name'
   },
   ar: {
     // Header & Navigation  
@@ -308,7 +311,10 @@ const translations = {
     operationSuccessful: 'تمت العملية بنجاح',
     operationFailed: 'فشلت العملية. يرجى المحاولة مرة أخرى.',
     documentArchived: 'تم أرشفة المستندات النشطة بنجاح',
-    archiveError: 'فشل في أرشفة المستندات. يرجى المحاولة مرة أخرى.'
+    archiveError: 'فشل في أرشفة المستندات. يرجى المحاولة مرة أخرى.',
+    
+    // Barcode Actions
+    createBarcodeName: 'إنشاء اسم الباركود'
   }
 };
 

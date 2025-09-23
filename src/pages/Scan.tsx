@@ -414,7 +414,7 @@ const Scan = () => {
             onClick={() => setActiveTab('DocumentLookup')}
           >
             <ScanLine className="w-6 h-6 mr-3" />
-            Scan Barcode
+            {t('createBarcodeName')}
           </Button>
         </Card>
       </div>
